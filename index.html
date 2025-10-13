@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>ConfIA - Verificador de Notícias</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container"> <!-- Header com navegação -->
+        <header class="header">
+            <div class="logo"> Conf<span class="logo-ia">IA</span> </div>
+            <nav class="header-nav"> <button class="nav-link" id="howItWorksBtn">Como funciona?</button> <button
+                    class="nav-link" id="aboutBtn">Sobre</button> </nav>
+        </header> <!-- Conteúdo principal -->
+        <main class="main-content"> <!-- Mascote -->
+            <div class="mascot">
+                <div class="mascot-placeholder"> <img src="./public/logo.png" alt="Logo do site"> </div>
+            </div> <!-- Tagline -->
+            <h1 class="tagline"> Desconfie primeiro, depois conf<span class="tagline-ia">IA</span>. </h1>
+            <!-- Search Bar -->
+            <div class="search-container"> <input type="text" class="search-bar" id="searchInput"
+                    placeholder="Digite uma notícia ou faça upload de uma imagem" autocomplete="off">
+                <div class="search-icons-right"> <!-- Botão de Upload de Imagem --> <button class="icon-btn"
+                        id="uploadBtn" title="Upload de Imagem"> <i class="ph-bold ph-image"></i> </button>
+                    <!-- Input de arquivo (oculto) --> <input type="file" id="imageInput"
+                        accept="image/jpeg, image/jpg, image/png" style="display:none;"> <button class="icon-btn"
+                        id="searchBtn" title="Buscar"> <i class="ph-bold ph-magnifying-glass"></i> </button> </div>
+            </div> <!-- Disclaimer -->
+            <div class="disclaimer">
+                <p class="disclaimer-text"> O ConfIA analisa manchetes com base em fontes de alcance nacional e
+                    internacional. Notícias regionais, locais ou muito recentes podem não aparecer nas verificações —
+                    isso não significa que sejam falsas, apenas que ainda não foram divulgadas </p>
+            </div>
+        </main> <!-- Results Section -->
+        <section class="results-section" id="resultsSection"> <!-- Verification Box -->
+            <div class="verification-box" id="verificationBox" style="display: none;">
+                <div class="verification-loading"> <span>🔍 Verificando. notícia...</span>
+                    <div class="spinner"></div>
+                </div>
+            </div> <!-- Caixa de Feedback -->
+            <div class="feedback-box" id="feedbackBox">
+                <div class="feedback-content">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-text" id="feedbackText"></div>
+                </div>
+            </div> <!-- Grade de Fontes -->
+            <div class="sources-grid" id="sourcesGrid"></div>
+        </section>
+    </div> <!-- Sobreposição Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header"> <span class="modal-icon" id="modalIcon">📖</span>
+                <h2 class="modal-title" id="modalTitle">Título do Modal</h2>
+            </div>
+            <div class="modal-content" id="modalContent"> O conteúdo do modal será inserido aqui. </div>
+            <div class="modal-footer"> <button class="modal-close-btn" id="modalCloseBtn">Fechar</button> </div>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+</body>
+
+</html>
