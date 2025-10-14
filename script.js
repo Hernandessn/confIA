@@ -1,16 +1,19 @@
 // ==========================================
-// CONFIGURAÇÃO - APENAS FRONTEND
+// CONFIGURAÇÃO - FRONTEND OTIMIZADO v6.0
 // ==========================================
 const API_KEYS = {
   gemini: 'AIzaSyBqBVTSzHb2SbnFgnDnVeo4hvyoRG39sro',
-  gnews: '60b4b4d5be152526fe0b37f78a2b60c2',
+  newsdata: 'pub_6dde2ebc4986466d82e1b5ac725fa99a',
+  currents: 'CFpXp_zt6b7-MrwMlDsR8z15MqxySjHLLNWaB3RwCVbAJeyt',
   ocrspace: 'K86239280388957'
 };
 
-// Proxy CORS para contornar bloqueios
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Cache simples para evitar requisições duplicadas
+const searchCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
 
-console.log('✅ ConfIA - Modo Frontend Only');
+console.log('✅ ConfIA v6.0 - Frontend Otimizado');
+console.log('🔑 APIs: NewsData.io, Currents, Gemini, OCR.space');
 
 // ==========================================
 // DOM ELEMENTS
@@ -382,7 +385,7 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
     return { level: 'MEDIA', reason: 'Fontes falam de temas diferentes', absurdityScore: absurdityCheck.score, sensationalismScore: sensationalismCheck.score, contextMatch: contextAnalysis.contextMatch };
   }
   
-  const tier1Sources = ['cnn', 'uol', 'g1', 'bbc', 'folha', 'estadao', 'oglobo'];
+  const tier1Sources = ['cnn', 'uol', 'g1', 'bbc', 'folha', 'estadao', 'oglobo', 'reuters', 'ap'];
   const tier1Count = sources.filter(s => tier1Sources.some(t => s.domain.includes(t))).length;
   
   let baseLevel;
@@ -459,17 +462,16 @@ async function analyzeWithAdvancedSystem(newsText, sources) {
 }
 
 async function analyzeWithGemini(newsText, sources, classification) {
-  const sourcesList = sources.slice(0, 5).map(s => `• ${s.source}`).join('\n');
   const prompt = `Análise ConfIA.
 
 Notícia: "${newsText}"
 Classificação: ${classification.level}
-Fontes: ${sources.length}
+Fontes encontradas: ${sources.length}
 
-Mantenha ${classification.level}. Retorne JSON:
-{"nivel": "${classification.level}", "explicacao": "breve", "recomendacao": "prática"}`;
+Mantenha classificação ${classification.level}. Retorne JSON:
+{"nivel": "${classification.level}", "explicacao": "breve e clara", "recomendacao": "prática"}`;
 
-  const response = await fetch(`${CORS_PROXY}https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEYS.gemini}`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEYS.gemini}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -486,13 +488,13 @@ Mantenha ${classification.level}. Retorne JSON:
 }
 
 // ==========================================
-// BUSCA DE NOTÍCIAS
+// BUSCA DE NOTÍCIAS - NOVAS APIS
 // ==========================================
 function extractKeywords(text) {
   if (!text) return '';
   const properNouns = text.match(/\b[A-ZÀÁÂÃ][a-zàáâãäåèéêë]+(?:\s+[A-ZÀÁÂÃ][a-zàáâãäåèéêë]+)*/g);
   if (properNouns && properNouns.length > 0) return properNouns.slice(0, 3).join(' ');
-  const stopWords = ['o', 'a', 'de', 'da', 'do', 'em', 'para', 'com', 'por', 'que'];
+  const stopWords = ['o', 'a', 'de', 'da', 'do', 'em', 'para', 'com', 'por', 'que', 'os', 'as'];
   const words = text.toLowerCase().replace(/[^\wáéíóúâêô\s]/g, ' ').split(/\s+/).filter(w => w.length > 4 && !stopWords.includes(w));
   return words.sort((a, b) => b.length - a.length).slice(0, 4).join(' ');
 }
@@ -520,7 +522,7 @@ function removeDuplicates(articles, query) {
     const normalized = article.title.toLowerCase().replace(/[^\w\s]/g, '').substring(0, 50);
     if (seen.has(normalized)) return;
     const relevance = calculateRelevance(query, article.title, article.description);
-    if (relevance >= 20) {
+    if (relevance >= 15) {
       article.relevance = relevance;
       seen.add(normalized);
       filtered.push(article);
@@ -529,81 +531,119 @@ function removeDuplicates(articles, query) {
   return filtered.sort((a, b) => b.relevance - a.relevance);
 }
 
-async function searchGNews(keywords, originalQuery) {
+// NewsData.io - Funcionamento direto
+async function searchNewsData(keywords, originalQuery) {
   try {
+    console.log('🔍 [NewsData] Buscando...');
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const url = `${CORS_PROXY}https://gnews.io/api/v4/search?q=${encodeURIComponent(keywords)}&lang=pt&country=br&max=20&apikey=${API_KEYS.gnews}`;
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    
+    const url = `https://newsdata.io/api/1/news?apikey=${API_KEYS.newsdata}&q=${encodeURIComponent(keywords)}&language=pt&country=br`;
+    
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);
-    if (!response.ok) return [];
+    
+    if (!response.ok) {
+      console.warn('⚠️ [NewsData] HTTP', response.status);
+      return [];
+    }
+    
     const data = await response.json();
-    if (!data.articles) return [];
-    return data.articles.map(a => ({
+    
+    if (!data.results || data.results.length === 0) {
+      console.log('ℹ️ [NewsData] Sem resultados');
+      return [];
+    }
+    
+    console.log(`✅ [NewsData] ${data.results.length} notícias`);
+    
+    return data.results.map(a => ({
       title: a.title,
-      source: a.source.name,
-      url: a.url,
-      publishedAt: a.publishedAt,
-      description: a.description,
-      logoUrl: getLogoUrl(a.url),
-      domain: extractDomain(a.url),
-      api: 'GNews'
+      source: a.source_id || 'NewsData',
+      url: a.link,
+      publishedAt: a.pubDate,
+      description: a.description || '',
+      logoUrl: getLogoUrl(a.link),
+      domain: extractDomain(a.link),
+      api: 'NewsData.io'
     }));
   } catch (error) {
-    console.error('GNews erro:', error.name === 'AbortError' ? 'Timeout' : error.message);
+    console.error('❌ [NewsData]:', error.name === 'AbortError' ? 'Timeout' : error.message);
     return [];
   }
 }
 
-async function searchGoogleNewsRSS(keywords) {
+// Currents API - Funcionamento direto
+async function searchCurrents(keywords, originalQuery) {
   try {
+    console.log('🔍 [Currents] Buscando...');
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const url = `${CORS_PROXY}https://news.google.com/rss/search?q=${encodeURIComponent(keywords)}&hl=pt-BR&gl=BR&ceid=BR:pt-419`;
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    
+    const url = `https://api.currentsapi.services/v1/search?keywords=${encodeURIComponent(keywords)}&language=pt&apiKey=${API_KEYS.currents}`;
+    
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);
-    if (!response.ok) return [];
-    const text = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, 'text/xml');
-    const items = xml.querySelectorAll('item');
-    const results = [];
-    items.forEach((item, index) => {
-      if (index >= 20) return;
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const sourceMatch = title.match(/- (.+)$/);
-      const sourceName = sourceMatch ? sourceMatch[1] : 'Google News';
-      if (link && title) {
-        results.push({
-          title: title.replace(/ - .+$/, ''),
-          source: sourceName,
-          url: link,
-          publishedAt: pubDate,
-          description: '',
-          logoUrl: getLogoUrl(link),
-          domain: extractDomain(link),
-          api: 'Google RSS'
-        });
-      }
-    });
-    return results;
+    
+    if (!response.ok) {
+      console.warn('⚠️ [Currents] HTTP', response.status);
+      return [];
+    }
+    
+    const data = await response.json();
+    
+    if (!data.news || data.news.length === 0) {
+      console.log('ℹ️ [Currents] Sem resultados');
+      return [];
+    }
+    
+    console.log(`✅ [Currents] ${data.news.length} notícias`);
+    
+    return data.news.map(a => ({
+      title: a.title,
+      source: a.author || 'Currents',
+      url: a.url,
+      publishedAt: a.published,
+      description: a.description || '',
+      logoUrl: getLogoUrl(a.url),
+      domain: extractDomain(a.url),
+      api: 'Currents API'
+    }));
   } catch (error) {
-    console.error('Google RSS erro:', error.name === 'AbortError' ? 'Timeout' : error.message);
+    console.error('❌ [Currents]:', error.name === 'AbortError' ? 'Timeout' : error.message);
     return [];
   }
 }
 
+// Busca em todas APIs com fallback inteligente
 async function searchAllAPIs(keywords, originalQuery) {
   console.log('🔍 Buscando fontes...');
-  const [gnewsResults, googleRSSResults] = await Promise.all([
-    searchGNews(keywords, originalQuery),
-    searchGoogleNewsRSS(keywords, originalQuery)
+  
+  // Verifica cache primeiro
+  const cacheKey = keywords.toLowerCase();
+  const cached = searchCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+    console.log('💾 Cache hit! Usando resultados salvos');
+    return cached.results;
+  }
+  
+  // Busca paralela nas duas APIs
+  const [newsdataResults, currentsResults] = await Promise.all([
+    searchNewsData(keywords, originalQuery),
+    searchCurrents(keywords, originalQuery)
   ]);
-  const allResults = [...gnewsResults, ...googleRSSResults];
+  
+  const allResults = [...newsdataResults, ...currentsResults];
   const uniqueResults = removeDuplicates(allResults, originalQuery);
-  console.log(`✅ ${allResults.length} → ${uniqueResults.length} (após filtro)`);
+  
+  console.log(`✅ Total: ${allResults.length} → ${uniqueResults.length} (após filtro)`);
+  
+  // Salva no cache
+  searchCache.set(cacheKey, {
+    results: uniqueResults,
+    timestamp: Date.now()
+  });
+  
   return uniqueResults;
 }
 
@@ -667,7 +707,7 @@ function renderFeedback(analysis, sources) {
     <div style="margin-bottom: 1.5rem;">
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
         <span style="font-size: 1.5rem;">🤖</span>
-        <strong style="color: #e5e5e5; font-size: 1.05rem;">Análise</strong>
+        <strong style="color: #e5e5e5; font-size: 1.05rem;">Análise IA</strong>
       </div>
       <p style="margin: 0; padding: 1rem; background: #1a1a1a; border-radius: 8px; line-height: 1.7; color: #e5e5e5;">
         ${analysis.explicacao}
@@ -698,7 +738,7 @@ function renderFeedback(analysis, sources) {
       <div style="padding: 1rem; background: #1a1a1a; border-left: 4px solid #3b82f6; border-radius: 8px;">
         <div style="color: #93c5fd; line-height: 1.8;">
           • <strong>${sources.length}</strong> notícias encontradas<br>
-          • APIs: GNews, Google News RSS
+          • APIs: NewsData.io, Currents API
         </div>
       </div>
     </div>
@@ -772,8 +812,6 @@ function renderSources(sources) {
       : `<div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">${source.source.charAt(0)}</div>`;
     
     const publishDate = source.publishedAt ? new Date(source.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
-    const similarity = source.semanticSimilarity || source.relevance || 0;
-    const simColor = similarity >= 50 ? '#10b981' : similarity >= 30 ? '#f59e0b' : '#6b7280';
     
     card.innerHTML = `
       <div style="display: flex; gap: 1rem; align-items: start;">
@@ -781,10 +819,10 @@ function renderSources(sources) {
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 700; color: #e5e5e5; margin-bottom: 0.25rem;">${source.source}</div>
           <div style="color: #9ca3af; font-size: 0.8rem; margin-bottom: 0.75rem;">
-            🌐 ${source.domain} ${publishDate ? `• 📅 ${publishDate}` : ''} • ${source.api}<br>
-            <span style="color: ${simColor}; font-weight: 600;">🎯 ${similarity.toFixed(0)}%</span>
+            🌐 ${source.domain} ${publishDate ? `• 📅 ${publishDate}` : ''} • ${source.api}
           </div>
           <div style="color: #d1d5db; line-height: 1.5; margin-bottom: 0.75rem;">${source.title}</div>
+          ${source.description ? `<div style="color: #9ca3af; font-size: 0.9rem; line-height: 1.4; margin-bottom: 0.75rem;">${source.description.substring(0, 150)}${source.description.length > 150 ? '...' : ''}</div>` : ''}
           <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; background: #3b82f6; color: white; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
             🔗 Ler completa
           </div>
@@ -856,7 +894,7 @@ async function handleSearch() {
     const keywords = extractKeywords(query);
     updateVerificationStatus('📰 Buscando fontes...');
     const sources = await searchAllAPIs(keywords, query);
-    updateVerificationStatus('🤖 Analisando...');
+    updateVerificationStatus('🤖 Analisando com IA...');
     const analysis = await analyzeWithAdvancedSystem(query, sources);
     verificationBox.style.display = 'none';
     analytics.logSearch(query, analysis.nivel, sources.length);
@@ -865,7 +903,7 @@ async function handleSearch() {
   } catch (error) {
     console.error('Erro:', error);
     verificationBox.style.display = 'none';
-    feedbackText.innerHTML = `<div style="padding: 2rem; text-align: center;"><div style="font-size: 3rem;">❌</div><strong style="color: #ef4444;">Erro ao verificar</strong></div>`;
+    feedbackText.innerHTML = `<div style="padding: 2rem; text-align: center;"><div style="font-size: 3rem;">❌</div><strong style="color: #ef4444;">Erro ao verificar</strong><p style="color: #9ca3af; margin-top: 1rem;">${error.message}</p></div>`;
   }
 }
 
@@ -885,23 +923,33 @@ const analytics = {
   logSearch(query, level, sourcesCount) {
     this.totalSearches++;
     this.classifications[level]++;
-    console.log('📊 Stats:', { total: this.totalSearches, level, sources: sourcesCount });
+    console.log('📊 Stats:', { 
+      total: this.totalSearches, 
+      level, 
+      sources: sourcesCount,
+      classifications: this.classifications 
+    });
   }
 };
 
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
-console.log('✅ ConfIA v5.0 - Frontend Only');
-console.log('🔑 APIs: GNews, Google RSS, OCR.space, Gemini');
-console.log('🌐 CORS Proxy:', CORS_PROXY);
-console.log('✅ ConfIA v5.0 - SISTEMA SIMPLIFICADO - Carregado!');
-console.log('⚠️ API Keys expostas diretamente no código');
-console.log('🚀 Funcionalidades ativas:');
-console.log('  ✓ Análise semântica de contexto');
-console.log('  ✓ Detecção avançada de sensacionalismo');
+console.log('✅ ConfIA v6.0 - Sistema Otimizado Carregado!');
+console.log('🔑 APIs Ativas:');
+console.log('  ✓ NewsData.io (frontend-friendly)');
+console.log('  ✓ Currents API (frontend-friendly)');
+console.log('  ✓ Google Gemini 2.0 (análise IA)');
+console.log('  ✓ OCR.space (extração de texto)');
+console.log('🚀 Recursos:');
+console.log('  ✓ Cache inteligente (5min)');
+console.log('  ✓ Busca paralela em 2 APIs');
+console.log('  ✓ Fallback automático');
+console.log('  ✓ Análise semântica avançada');
+console.log('  ✓ Detecção de sensacionalismo');
 console.log('  ✓ Sistema de pontuação de absurdos');
 console.log('  ✓ Comparação contextual com fontes');
-console.log('  ✓ Classificação inteligente multinível');
-console.log('  ✓ OCR para extração de texto de imagens');
-console.log('  ✓ Integração com Gemini, NewsAPI, GNews e Google News RSS');
+console.log('  ✓ Rate limiting (10 req/min)');
+console.log('  ✓ OCR com compressão automática');
+console.log('💾 Cache ativo para otimizar requisições');
+console.log('⚠️ Modo frontend: keys expostas (use apenas para testes)');
