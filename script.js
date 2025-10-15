@@ -1,5 +1,10 @@
 // ==========================================
-// CONFIGURAÇÃO - CONFIA v8.0 SISTEMA RIGOROSO
+// CONFIA v9.0 - SISTEMA EDUCATIVO E BLINDADO
+// Sistema de verificação de fake news com IA
+// ==========================================
+
+// ==========================================
+// CONFIGURAÇÃO DE APIs
 // ==========================================
 const API_KEYS = {
   gemini: 'AIzaSyBqBVTSzHb2SbnFgnDnVeo4hvyoRG39sro',
@@ -8,14 +13,18 @@ const API_KEYS = {
   ocrspace: 'K86239280388957'
 };
 
+// ==========================================
+// CACHE E CONFIGURAÇÕES GLOBAIS
+// ==========================================
 const searchCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+const MAX_HISTORY_ITEMS = 10; // Máximo de itens no histórico
 
-console.log('✅ ConfIA v8.0 - Sistema Rigoroso Ativado');
-console.log('🛡️ Detecção avançada + Classificação rigorosa');
+console.log('✅ ConfIA v9.0 - Sistema Educativo e Blindado Ativado');
+console.log('🛡️ Detecção avançada + Classificação rigorosa + Recursos educativos');
 
 // ==========================================
-// DOM ELEMENTS
+// ELEMENTOS DO DOM
 // ==========================================
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -25,6 +34,13 @@ const resultsSection = document.getElementById("resultsSection");
 const verificationBox = document.getElementById("verificationBox");
 const feedbackText = document.getElementById("feedbackText");
 const sourcesGrid = document.getElementById("sourcesGrid");
+const charCounter = document.getElementById("charCounter");
+const apiStatus = document.getElementById("apiStatus");
+const recentNewsWidget = document.getElementById("recentNewsWidget");
+const recentNewsList = document.getElementById("recentNewsList");
+const explanationBtn = document.getElementById("explanationBtn");
+const confiaTip = document.getElementById("confiaTip");
+const tipText = document.getElementById("tipText");
 
 // ==========================================
 // SISTEMA DE MODAIS
@@ -36,38 +52,135 @@ const modalContent = document.getElementById('modalContent');
 const modalCloseBtn = document.getElementById('modalCloseBtn');
 const howItWorksBtn = document.getElementById('howItWorksBtn');
 const aboutBtn = document.getElementById('aboutBtn');
+const historyBtn = document.getElementById('historyBtn');
+const statsBtn = document.getElementById('statsBtn');
 
+// Dados dos modais
 const modalData = {
   howItWorks: {
     icon: '⚙️',
-    title: 'Como funciona?',
-    content: `O ConfIA utiliza <strong>Inteligência Artificial</strong> e <strong>APIs de notícias</strong> para verificar manchetes e avaliar sua confiabilidade.<br><br>O sistema analisa: <strong>padrões de linguagem</strong>, <strong>sinais de sensacionalismo</strong>, <strong>contradições lógicas</strong> e compara com <strong>fontes verificadas</strong>.<br><br>⚠️ <em>Este é um sistema educativo. Sempre confirme em múltiplas fontes confiáveis.</em>`
+    title: 'Como funciona o ConfIA?',
+    content: `
+      <p>O ConfIA utiliza <strong>Inteligência Artificial</strong> (Google Gemini 2.0) e <strong>APIs de notícias</strong> para verificar manchetes e avaliar sua confiabilidade.</p>
+      
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🔍 Sistema de Análise em 3 Camadas:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li><strong>Camada Semântica:</strong> Analisa o significado e contexto das palavras</li>
+        <li><strong>Camada Comportamental:</strong> Detecta padrões de sensacionalismo e clickbait</li>
+        <li><strong>Camada Lógica:</strong> Identifica contradições e absurdos</li>
+      </ul>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">📊 O que analisamos:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li>Padrões de linguagem sensacionalista</li>
+        <li>Sinais de urgência artificial</li>
+        <li>Promessas irreais ou impossíveis</li>
+        <li>Teorias conspiratórias conhecidas</li>
+        <li>Comparação com fontes verificadas</li>
+        <li>Consenso entre veículos de imprensa</li>
+      </ul>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🎯 Classificação de Confiabilidade:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li>🟢 <strong>ALTA:</strong> Confirmada por múltiplas fontes confiáveis</li>
+        <li>🟡 <strong>MÉDIA:</strong> Parcialmente verificada, requer cautela</li>
+        <li>🔵 <strong>NEUTRA:</strong> Sem confirmação ampla (pode ser regional/recente)</li>
+        <li>🔴 <strong>BAIXA:</strong> Sinais de desinformação detectados</li>
+      </ul>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0.5rem;">
+        <strong style="color: #ef4444;">⚠️ Importante:</strong> Este é um sistema educativo. Sempre confirme informações importantes em múltiplas fontes confiáveis.
+      </div>
+    `
   },
   about: {
     icon: 'ℹ️',
-    title: 'Sobre',
-    content: `O ConfIA é um projeto educativo para <strong>combater a desinformação</strong>, desenvolvido para a <strong>Maratona Tech</strong>.<br><br>Nossa missão: democratizar o acesso à verificação de fatos e <strong>ensinar</strong> as pessoas a identificarem fake news.<br><br>📚 Dicas: Desconfie de linguagem emocional excessiva, promessas irreais e notícias sem fontes verificáveis.`
+    title: 'Sobre o ConfIA',
+    content: `
+      <p>O ConfIA é um projeto educativo desenvolvido para <strong>combater a desinformação</strong> e ensinar as pessoas a identificarem fake news.</p>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🎯 Nossa Missão:</h3>
+      <p>Democratizar o acesso à verificação de fatos e capacitar as pessoas com ferramentas e conhecimento para identificar notícias falsas.</p>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🛠️ Tecnologias Utilizadas:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li><strong>Google Gemini 2.0 Flash:</strong> Análise de linguagem natural</li>
+        <li><strong>NewsData.io:</strong> Base de notícias brasileiras</li>
+        <li><strong>Currents API:</strong> Notícias internacionais</li>
+        <li><strong>OCR.space:</strong> Extração de texto de imagens</li>
+      </ul>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">📚 Dicas para Identificar Fake News:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li>Desconfie de linguagem emocional excessiva</li>
+        <li>Verifique a data e a fonte da notícia</li>
+        <li>Busque confirmação em veículos tradicionais</li>
+        <li>Desconfie de promessas irreais ou milagrosas</li>
+        <li>Cuidado com notícias sem autor identificado</li>
+        <li>Evite compartilhar antes de verificar</li>
+      </ul>
+
+      <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🔍 Fact-Checkers Recomendados:</h3>
+      <ul style="line-height: 2; padding-left: 1.5rem;">
+        <li><strong>Aos Fatos:</strong> aosfatos.org</li>
+        <li><strong>Agência Lupa:</strong> piaui.folha.uol.com.br/lupa</li>
+        <li><strong>Comprova:</strong> projetocomprova.com.br</li>
+        <li><strong>Fato ou Fake (G1):</strong> g1.globo.com/fato-ou-fake</li>
+      </ul>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; border-radius: 0.5rem;">
+        <strong style="color: #3b82f6;">💡 Lembre-se:</strong> Pense antes de compartilhar. Fake news se espalham mais rápido que a verdade.
+      </div>
+    `
+  },
+  history: {
+    icon: '📜',
+    title: 'Histórico de Verificações',
+    content: '<div id="historyContent"></div>'
+  },
+  stats: {
+    icon: '📊',
+    title: 'Estatísticas de Uso',
+    content: '<div id="statsContent"></div>'
   }
 };
 
+/**
+ * Abre um modal específico
+ */
 function openModal(type) {
   const data = modalData[type];
   if (!data) return;
+  
   modalIcon.textContent = data.icon;
   modalTitle.textContent = data.title;
   modalContent.innerHTML = data.content;
+  
+  if (type === 'history') {
+    renderHistoryModal();
+  } else if (type === 'stats') {
+    renderStatsModal();
+  }
+  
   modalOverlay.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
 
+/**
+ * Fecha o modal ativo
+ */
 function closeModal() {
   modalOverlay.classList.remove('active');
   document.body.style.overflow = '';
 }
 
+// Event Listeners dos modais
 if (howItWorksBtn) howItWorksBtn.addEventListener('click', () => openModal('howItWorks'));
 if (aboutBtn) aboutBtn.addEventListener('click', () => openModal('about'));
+if (historyBtn) historyBtn.addEventListener('click', () => openModal('history'));
+if (statsBtn) statsBtn.addEventListener('click', () => openModal('stats'));
 if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+
 if (modalOverlay) {
   modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) closeModal();
@@ -81,8 +194,259 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ==========================================
-// VALIDAÇÃO DE ENTRADA REFORÇADA
+// SISTEMA DE HISTÓRICO LOCAL
 // ==========================================
+
+function saveToHistory(query, level, sourcesCount) {
+  try {
+    const history = getHistory();
+    
+    const newEntry = {
+      id: Date.now(),
+      query: query.substring(0, 200),
+      level: level,
+      sourcesCount: sourcesCount,
+      timestamp: new Date().toISOString()
+    };
+    
+    history.unshift(newEntry);
+    
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history.splice(MAX_HISTORY_ITEMS);
+    }
+    
+    localStorage.setItem('confiaHistory', JSON.stringify(history));
+    console.log('💾 Análise salva no histórico');
+  } catch (error) {
+    console.warn('⚠️ Erro ao salvar histórico:', error);
+  }
+}
+
+function getHistory() {
+  try {
+    const stored = localStorage.getItem('confiaHistory');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.warn('⚠️ Erro ao carregar histórico:', error);
+    return [];
+  }
+}
+
+function clearHistory() {
+  try {
+    localStorage.removeItem('confiaHistory');
+    console.log('🧹 Histórico limpo');
+  } catch (error) {
+    console.warn('⚠️ Erro ao limpar histórico:', error);
+  }
+}
+
+function renderHistoryModal() {
+  const container = document.getElementById('historyContent');
+  if (!container) return;
+  
+  const history = getHistory();
+  
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div class="history-empty">
+        <div class="history-empty-icon">📭</div>
+        <p>Nenhuma verificação realizada ainda.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Seu histórico de análises aparecerá aqui.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '<div class="history-list">';
+  
+  history.forEach(item => {
+    const date = new Date(item.timestamp);
+    const dateStr = date.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    html += `
+      <div class="history-item">
+        <div class="history-header">
+          <span class="history-date">📅 ${dateStr}</span>
+          <span class="history-level ${item.level}">${item.level}</span>
+        </div>
+        <div class="history-query">${item.query}</div>
+        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #9ca3af;">
+          📰 ${item.sourcesCount} fonte${item.sourcesCount !== 1 ? 's' : ''} encontrada${item.sourcesCount !== 1 ? 's' : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  html += `
+    <div style="margin-top: 1.5rem; text-align: center;">
+      <button onclick="clearHistoryAndRefresh()" style="background: #ef4444; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+        🗑️ Limpar Histórico
+      </button>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+function clearHistoryAndRefresh() {
+  if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+    clearHistory();
+    renderHistoryModal();
+  }
+}
+
+// ==========================================
+// SISTEMA DE ANALYTICS E ESTATÍSTICAS
+// ==========================================
+
+const analytics = {
+  totalSearches: 0,
+  classifications: { ALTA: 0, MEDIA: 0, NEUTRA: 0, BAIXA: 0 },
+  
+  logSearch(query, level, sourcesCount) {
+    this.totalSearches++;
+    this.classifications[level]++;
+    
+    saveToHistory(query, level, sourcesCount);
+    this.saveStats();
+    
+    console.log('📊 Estatísticas:', { 
+      total: this.totalSearches, 
+      nivel: level, 
+      fontes: sourcesCount,
+      distribuicao: this.classifications 
+    });
+  },
+  
+  saveStats() {
+    try {
+      const stats = {
+        totalSearches: this.totalSearches,
+        classifications: this.classifications,
+        lastUpdate: new Date().toISOString()
+      };
+      localStorage.setItem('confiaStats', JSON.stringify(stats));
+    } catch (error) {
+      console.warn('⚠️ Erro ao salvar estatísticas:', error);
+    }
+  },
+  
+  loadStats() {
+    try {
+      const stored = localStorage.getItem('confiaStats');
+      if (stored) {
+        const stats = JSON.parse(stored);
+        this.totalSearches = stats.totalSearches || 0;
+        this.classifications = stats.classifications || { ALTA: 0, MEDIA: 0, NEUTRA: 0, BAIXA: 0 };
+        console.log('📈 Estatísticas carregadas:', stats);
+      }
+    } catch (error) {
+      console.warn('⚠️ Erro ao carregar estatísticas:', error);
+    }
+  },
+  
+  getStats() {
+    return {
+      total: this.totalSearches,
+      classifications: this.classifications,
+      avgPerLevel: Object.entries(this.classifications).map(([k, v]) => ({
+        nivel: k,
+        count: v,
+        percentage: this.totalSearches > 0 ? ((v / this.totalSearches) * 100).toFixed(1) + '%' : '0%'
+      }))
+    };
+  }
+};
+
+analytics.loadStats();
+
+function renderStatsModal() {
+  const container = document.getElementById('statsContent');
+  if (!container) return;
+  
+  const stats = analytics.getStats();
+  
+  if (stats.total === 0) {
+    container.innerHTML = `
+      <div class="history-empty">
+        <div class="history-empty-icon">📊</div>
+        <p>Nenhuma análise realizada ainda.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Suas estatísticas de uso aparecerão aqui.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = `
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <div class="dashboard-value">${stats.total}</div>
+        <div class="dashboard-label">Total de Análises</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-value" style="color: #10b981;">${stats.classifications.ALTA}</div>
+        <div class="dashboard-label">Alta Confiabilidade</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-value" style="color: #f59e0b;">${stats.classifications.MEDIA}</div>
+        <div class="dashboard-label">Média Confiabilidade</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-value" style="color: #6366f1;">${stats.classifications.NEUTRA}</div>
+        <div class="dashboard-label">Neutra</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-value" style="color: #ef4444;">${stats.classifications.BAIXA}</div>
+        <div class="dashboard-label">Baixa Confiabilidade</div>
+      </div>
+    </div>
+
+    <div class="dashboard-chart">
+      <h3 style="color: #ffffff; margin-bottom: 1rem;">📊 Distribuição de Classificações</h3>
+      <div class="chart-bars">
+  `;
+  
+  const maxValue = Math.max(...Object.values(stats.classifications));
+  
+  const colors = {
+    ALTA: '#10b981',
+    MEDIA: '#f59e0b',
+    NEUTRA: '#6366f1',
+    BAIXA: '#ef4444'
+  };
+  
+  stats.avgPerLevel.forEach(item => {
+    const height = maxValue > 0 ? (item.count / maxValue) * 100 : 0;
+    html += `
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div class="chart-bar-value">${item.count}</div>
+        <div class="chart-bar" style="height: ${height}%; background: linear-gradient(to top, ${colors[item.nivel]}, ${colors[item.nivel]}dd);"></div>
+        <div class="chart-bar-label">${item.nivel}<br>${item.percentage}</div>
+      </div>
+    `;
+  });
+  
+  html += `
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// ==========================================
+// VALIDAÇÃO E SANITIZAÇÃO DE ENTRADA
+// ==========================================
+
 function sanitizeInput(text) {
   if (!text || typeof text !== 'string') return '';
   
@@ -101,11 +465,11 @@ function validateInput(text) {
   const errors = [];
   
   if (!text || text.length < 15) {
-    errors.push('Texto muito curto. Digite pelo menos 15 caracteres.');
+    errors.push('❌ Texto muito curto. Digite pelo menos 15 caracteres.');
   }
   
   if (text.length > 500) {
-    errors.push('Texto muito longo. Máximo: 500 caracteres.');
+    errors.push('❌ Texto muito longo. Máximo: 500 caracteres.');
   }
   
   const suspiciousPatterns = [
@@ -115,32 +479,74 @@ function validateInput(text) {
   ];
   
   if (suspiciousPatterns.some(pattern => pattern.test(text))) {
-    errors.push('Entrada contém caracteres não permitidos.');
+    errors.push('❌ Entrada contém caracteres não permitidos.');
   }
   
   if (/(.)\1{10,}/.test(text)) {
-    errors.push('Texto com repetições suspeitas.');
+    errors.push('❌ Texto com repetições suspeitas.');
   }
   
   return { valid: errors.length === 0, errors };
 }
 
 // ==========================================
-// BOTÃO DE UPLOAD
+// CONTADOR DE CARACTERES
 // ==========================================
-if (uploadBtn && imageInput) {
-  uploadBtn.addEventListener('click', () => imageInput.click());
-  imageInput.addEventListener('change', handleImageUpload);
+
+function updateCharCounter() {
+  if (!searchInput || !charCounter) return;
+  
+  const length = searchInput.value.length;
+  const max = 500;
+  
+  charCounter.textContent = `${length} / ${max} caracteres`;
+  
+  charCounter.classList.remove('warning', 'error');
+  
+  if (length > max * 0.9) {
+    charCounter.classList.add('error');
+  } else if (length > max * 0.7) {
+    charCounter.classList.add('warning');
+  }
+}
+
+if (searchInput) {
+  searchInput.addEventListener('input', updateCharCounter);
 }
 
 // ==========================================
-// COMPRESSÃO DE IMAGEM
+// SISTEMA DE UPLOAD E OCR
 // ==========================================
+
+function validateImage(file) {
+  const errors = [];
+  
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  if (!allowedTypes.includes(file.type)) {
+    errors.push('❌ Formato inválido. Use apenas JPG ou PNG.');
+  }
+  
+  const maxSize = 10 * 1024 * 1024;
+  const minSize = 50 * 1024;
+  
+  if (file.size > maxSize) {
+    errors.push(`❌ Imagem muito grande (${(file.size/1024/1024).toFixed(1)}MB). Máximo: 10MB.`);
+  }
+  
+  if (file.size < minSize) {
+    errors.push('❌ Imagem muito pequena. Pode estar corrompida ou sem conteúdo.');
+  }
+  
+  return { valid: errors.length === 0, errors };
+}
+
 async function compressImage(file, maxSizeKB = 800) {
   return new Promise((resolve) => {
     const reader = new FileReader();
+    
     reader.onload = (e) => {
       const img = new Image();
+      
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
@@ -159,6 +565,7 @@ async function compressImage(file, maxSizeKB = 800) {
         
         canvas.width = width;
         canvas.height = height;
+        
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
         
@@ -179,19 +586,20 @@ async function compressImage(file, maxSizeKB = 800) {
             resolve(compressedFile);
           });
       };
+      
       img.src = e.target.result;
     };
+    
     reader.readAsDataURL(file);
   });
 }
 
-// ==========================================
-// OCR (EXTRAÇÃO DE TEXTO)
-// ==========================================
 async function extractTextFromImage(file) {
-  console.log('🟢 [OCR] Iniciando...');
+  console.log('🟢 [OCR] Iniciando extração de texto...');
+  
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.onload = async () => {
       try {
         const formData = new FormData();
@@ -208,13 +616,19 @@ async function extractTextFromImage(file) {
           body: formData
         });
         
-        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`Erro HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
-        if (data.IsErroredOnProcessing) throw new Error(data.ErrorMessage || 'Erro no OCR');
+        
+        if (data.IsErroredOnProcessing) {
+          throw new Error(data.ErrorMessage || 'Erro no processamento OCR');
+        }
         
         if (data.ParsedResults && data.ParsedResults.length > 0) {
           const extractedText = data.ParsedResults[0].ParsedText || '';
-          console.log('✅ [OCR] Extraído:', extractedText.length, 'chars');
+          console.log('✅ [OCR] Texto extraído:', extractedText.length, 'caracteres');
           resolve(extractedText.trim().length === 0 ? '' : extractedText);
         } else {
           resolve('');
@@ -224,46 +638,19 @@ async function extractTextFromImage(file) {
         reject(new Error('Falha ao reconhecer texto: ' + error.message));
       }
     };
+    
     reader.onerror = () => reject(new Error('Erro ao ler arquivo'));
     reader.readAsDataURL(file);
   });
 }
 
-// ==========================================
-// VALIDAÇÃO DE IMAGEM
-// ==========================================
-function validateImage(file) {
-  const errors = [];
-  
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-  if (!allowedTypes.includes(file.type)) {
-    errors.push('Formato inválido. Use apenas JPG ou PNG.');
-  }
-  
-  const maxSize = 10 * 1024 * 1024;
-  const minSize = 50 * 1024;
-  
-  if (file.size > maxSize) {
-    errors.push(`Imagem muito grande (${(file.size/1024/1024).toFixed(1)}MB). Máximo: 10MB.`);
-  }
-  
-  if (file.size < minSize) {
-    errors.push('Imagem muito pequena. Pode estar corrompida ou sem conteúdo.');
-  }
-  
-  return { valid: errors.length === 0, errors };
-}
-
-// ==========================================
-// HANDLE UPLOAD
-// ==========================================
 async function handleImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
   const validation = validateImage(file);
   if (!validation.valid) {
-    alert('❌ ' + validation.errors.join('\n'));
+    alert(validation.errors.join('\n'));
     event.target.value = '';
     return;
   }
@@ -320,24 +707,36 @@ async function handleImageUpload(event) {
 }
 
 function showExtractedText(text) {
+  const old = document.getElementById('extractedTextBox');
+  if (old) old.remove();
+  
   const extractedTextBox = document.createElement('div');
   extractedTextBox.id = 'extractedTextBox';
-  extractedTextBox.style.cssText = `background: #2a2a2a; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid #3b82f6;`;
+  extractedTextBox.className = 'extracted-text-box';
   extractedTextBox.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-      <span style="font-size: 1.5rem;">📝</span>
-      <strong style="color: #3b82f6; font-size: 1.1rem;">Texto Reconhecido</strong>
+    <div class="extracted-header">
+      <span class="extracted-icon">📝</span>
+      <h3 class="extracted-title">Texto Reconhecido</h3>
     </div>
-    <div style="background: #1a1a1a; border-radius: 0.75rem; padding: 1.25rem; line-height: 1.7; color: #e5e5e5; white-space: pre-wrap;">
-      ${text.trim()}
-    </div>
+    <div class="extracted-content">${text.trim()}</div>
   `;
+  
   const feedbackBox = document.querySelector('.feedback-box');
   feedbackBox.parentNode.insertBefore(extractedTextBox, feedbackBox);
 }
 
 async function analyzeExtractedText(text) {
   verificationBox.style.display = 'block';
+  
+  // Remove gráfico anterior
+  const oldChart = document.getElementById('trustChartContainer');
+  if (oldChart) oldChart.remove();
+  
+  // Oculta o widget de notícias recentes durante a análise
+  if (recentNewsWidget) {
+    recentNewsWidget.style.display = 'none';
+  }
+  
   try {
     updateVerificationStatus('🔍 Extraindo keywords...');
     const keywords = extractKeywords(text);
@@ -348,17 +747,45 @@ async function analyzeExtractedText(text) {
     verificationBox.style.display = 'none';
     analytics.logSearch(text, analysis.nivel, sources.length);
     renderFeedback(analysis, sources);
+    
+    // Renderiza o gráfico de confiabilidade
+    renderTrustChart(analysis.nivel, analysis.confidence || 70);
+    
     renderSources(sources);
+    showConfiaTip(analysis.nivel);
+    
+    // Move o widget de notícias recentes para baixo dos resultados
+    if (recentNewsWidget && resultsSection) {
+      recentNewsWidget.style.display = 'block';
+      resultsSection.appendChild(recentNewsWidget);
+    }
   } catch (error) {
     console.error('Erro:', error);
     verificationBox.style.display = 'none';
-    feedbackText.innerHTML = `<div style="padding: 2rem; text-align: center;"><div style="font-size: 3rem;">❌</div><strong style="color: #ef4444;">Erro ao analisar</strong></div>`;
+    feedbackText.innerHTML = `
+      <div style="padding: 2rem; text-align: center;">
+        <div style="font-size: 3rem;">❌</div>
+        <strong style="color: #ef4444;">Erro ao analisar</strong>
+      </div>
+    `;
+    
+    // Reexibe o widget de notícias em caso de erro
+    if (recentNewsWidget) {
+      recentNewsWidget.style.display = 'block';
+    }
   }
 }
 
+// Configuração do botão de upload
+if (uploadBtn && imageInput) {
+  uploadBtn.addEventListener('click', () => imageInput.click());
+  imageInput.addEventListener('change', handleImageUpload);
+}
+
 // ==========================================
-// DETECÇÃO DE SENSACIONALISMO RIGOROSA
+// DETECÇÃO DE SENSACIONALISMO
 // ==========================================
+
 function detectSensationalism(text) {
   if (!text) return { score: 0, triggers: [] };
   const triggers = [];
@@ -420,8 +847,9 @@ function detectSensationalism(text) {
 }
 
 // ==========================================
-// DETECÇÃO DE ABSURDOS RIGOROSA
+// DETECÇÃO DE ABSURDOS
 // ==========================================
+
 function detectAbsurdity(text) {
   if (!text) return { isAbsurd: false, reasons: [], score: 0 };
   const reasons = [];
@@ -494,6 +922,7 @@ function detectAbsurdity(text) {
 // ==========================================
 // SIMILARIDADE SEMÂNTICA
 // ==========================================
+
 function calculateSemanticSimilarity(text1, text2) {
   if (!text1 || !text2) return 0;
   
@@ -521,8 +950,9 @@ function calculateSemanticSimilarity(text1, text2) {
 }
 
 // ==========================================
-// ANÁLISE CONTEXTUAL DE FONTES RIGOROSA
+// ANÁLISE CONTEXTUAL DE FONTES
 // ==========================================
+
 function analyzeSourcesContextualRelevance(originalText, sources) {
   if (!sources || sources.length === 0) {
     return { avgSimilarity: 0, relevantSources: 0, contextMatch: 'NONE', tier1Count: 0 };
@@ -573,6 +1003,7 @@ function analyzeSourcesContextualRelevance(originalText, sources) {
 // ==========================================
 // SISTEMA DE CLASSIFICAÇÃO RIGOROSO
 // ==========================================
+
 function determineAdvancedLevel(newsText, sources, contextAnalysis) {
   const absurdityCheck = detectAbsurdity(newsText);
   const sensationalismCheck = detectSensationalism(newsText);
@@ -647,11 +1078,11 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
     };
   }
   
-  // CLASSIFICAÇÃO POR FONTES E RELEVÂNCIA (MAIS RIGOROSA)
+  // CLASSIFICAÇÃO POR FONTES E RELEVÂNCIA
   let baseLevel;
   let confidence = 60;
   
-  // ALTA: Requisitos MUITO rigorosos
+  // ALTA: Requisitos rigorosos
   if (contextAnalysis.tier1Count >= 3 && 
       contextAnalysis.contextMatch === 'HIGH' && 
       absurdityCheck.score < 15 &&
@@ -659,7 +1090,6 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
     baseLevel = 'ALTA';
     confidence = 92;
   }
-  // ALTA: Muitas fontes com alta relevância
   else if (sources.length >= 6 && 
            contextAnalysis.contextMatch === 'HIGH' && 
            contextAnalysis.relevantSources >= 5 &&
@@ -667,34 +1097,30 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
     baseLevel = 'ALTA';
     confidence = 88;
   }
-  // MÉDIA: Boa confirmação com algumas ressalvas
+  // MÉDIA: Boa confirmação
   else if (sources.length >= 4 && 
            contextAnalysis.relevantSources >= 3 &&
            absurdityCheck.score < 25) {
     baseLevel = 'MEDIA';
     confidence = 75;
   }
-  // MÉDIA: Confirmação básica
   else if (sources.length >= 2 && 
            contextAnalysis.relevantSources >= 1 &&
            absurdityCheck.score < 30) {
     baseLevel = 'MEDIA';
     confidence = 65;
   }
-  // NEUTRA: Pouca ou nenhuma confirmação
+  // NEUTRA
   else if (sources.length >= 1) {
     baseLevel = 'NEUTRA';
     confidence = 50;
   }
-  // BAIXA: Sem fontes
   else {
     baseLevel = 'NEUTRA';
     confidence = 45;
   }
   
-  // PENALIZAÇÕES RIGOROSAS
-  
-  // Penalidade por sensacionalismo
+  // PENALIZAÇÕES
   if (sensationalismCheck.score >= 30) {
     confidence -= 25;
     if (baseLevel === 'ALTA') baseLevel = 'MEDIA';
@@ -702,20 +1128,17 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
     else if (baseLevel === 'NEUTRA') baseLevel = 'BAIXA';
   }
   
-  // Penalidade por absurdo moderado
   if (absurdityCheck.score >= 20) {
     confidence -= 20;
     if (baseLevel === 'ALTA') baseLevel = 'MEDIA';
     else if (baseLevel === 'MEDIA') baseLevel = 'NEUTRA';
   }
   
-  // Penalidade por poucas fontes tier 1
   if (contextAnalysis.tier1Count === 0 && sources.length > 0) {
     confidence -= 10;
     if (baseLevel === 'ALTA') baseLevel = 'MEDIA';
   }
   
-  // Bônus por múltiplas fontes tier 1
   if (contextAnalysis.tier1Count >= 3) {
     confidence += 10;
   }
@@ -733,6 +1156,7 @@ function determineAdvancedLevel(newsText, sources, contextAnalysis) {
 // ==========================================
 // ANÁLISE COMPLETA DO SISTEMA
 // ==========================================
+
 async function analyzeWithAdvancedSystem(newsText, sources) {
   const absurdityCheck = detectAbsurdity(newsText);
   const sensationalismCheck = detectSensationalism(newsText);
@@ -811,6 +1235,7 @@ async function analyzeWithAdvancedSystem(newsText, sources) {
 // ==========================================
 // INTEGRAÇÃO COM GEMINI
 // ==========================================
+
 async function analyzeWithGemini(newsText, sources, classification) {
   const sourcesInfo = sources.length > 0 
     ? `Fontes: ${sources.slice(0, 3).map(s => s.source).join(', ')}` 
@@ -864,6 +1289,7 @@ Retorne JSON:
 // ==========================================
 // BUSCA DE NOTÍCIAS - EXTRAÇÃO DE KEYWORDS
 // ==========================================
+
 function extractKeywords(text) {
   if (!text) return '';
   
@@ -884,6 +1310,7 @@ function extractKeywords(text) {
 // ==========================================
 // CÁLCULO DE RELEVÂNCIA
 // ==========================================
+
 function calculateRelevance(query, title, desc = '') {
   if (!query || !title) return 0;
   
@@ -905,6 +1332,7 @@ function calculateRelevance(query, title, desc = '') {
 // ==========================================
 // REMOÇÃO DE DUPLICATAS
 // ==========================================
+
 function removeDuplicates(articles, query) {
   if (!Array.isArray(articles)) return [];
   
@@ -935,6 +1363,7 @@ function removeDuplicates(articles, query) {
 // ==========================================
 // NEWSDATA.IO API
 // ==========================================
+
 async function searchNewsData(keywords, originalQuery) {
   try {
     console.log('🔍 [NewsData] Buscando...');
@@ -980,6 +1409,7 @@ async function searchNewsData(keywords, originalQuery) {
 // ==========================================
 // CURRENTS API
 // ==========================================
+
 async function searchCurrents(keywords, originalQuery) {
   try {
     console.log('🔍 [Currents] Buscando...');
@@ -1025,6 +1455,7 @@ async function searchCurrents(keywords, originalQuery) {
 // ==========================================
 // BUSCA EM TODAS AS APIS
 // ==========================================
+
 async function searchAllAPIs(keywords, originalQuery) {
   console.log('🔍 Buscando fontes...');
   
@@ -1057,6 +1488,7 @@ async function searchAllAPIs(keywords, originalQuery) {
 // ==========================================
 // UTILITÁRIOS
 // ==========================================
+
 function extractDomain(url) {
   if (!url) return '';
   try {
@@ -1071,9 +1503,17 @@ function getLogoUrl(url) {
   return domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null;
 }
 
+function updateVerificationStatus(message) {
+  if (verificationBox && verificationBox.querySelector('.verification-loading')) {
+    const el = verificationBox.querySelector('.verification-loading span:first-child');
+    if (el) el.textContent = message;
+  }
+}
+
 // ==========================================
 // RENDERIZAÇÃO DE FEEDBACK
 // ==========================================
+
 function renderFeedback(analysis, sources) {
   const feedbackBox = document.querySelector('.feedback-box');
   const feedbackIcon = feedbackBox.querySelector('.feedback-icon');
@@ -1166,8 +1606,7 @@ function renderFeedback(analysis, sources) {
       <div style="padding: 1rem; background: #1a1a1a; border-left: 4px solid #3b82f6; border-radius: 8px;">
         <div style="color: #93c5fd; line-height: 1.8;">
           • <strong>${sources.length}</strong> notícia(s) encontrada(s)<br>
-          • APIs utilizadas: NewsData.io, Currents API<br>
-          • Análise: ${analysis.contextMatch} relevância contextual
+          • APIs utilizadas: NewsData.io<br>
         </div>
       </div>
     </div>
@@ -1202,82 +1641,331 @@ function renderFeedback(analysis, sources) {
   
   feedbackTextEl.innerHTML = html;
 }
+// ==========================================
+// RENDERIZAÇÃO DE FONTES - VERSÃO MELHORADA
+// ==========================================
 
-// ==========================================
-// RENDERIZAÇÃO DE FONTES
-// ==========================================
 function renderSources(sources) {
   sourcesGrid.innerHTML = '';
   if (sources.length === 0) return;
   
+  // Título da seção (mantido)
   const title = document.createElement('div');
-  title.style.cssText = `margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 12px; border-left: 4px solid #3b82f6;`;
+  title.style.cssText = `
+    margin-bottom: 1.5rem; 
+    padding: 1rem; 
+    background: linear-gradient(135deg, #1e293b, #0f172a); 
+    border-radius: 12px; 
+    border-left: 4px solid #3b82f6;
+  `;
   title.innerHTML = `
     <div style="display: flex; align-items: center; gap: 0.75rem;">
       <span style="font-size: 1.8rem;">📰</span>
       <div>
-        <strong style="color: #93c5fd; font-size: 1.2rem;">Notícias Relacionadas</strong>
-        <p style="margin: 0.5rem 0 0 0; color: #cbd5e1; font-size: 0.9rem;">${sources.length} notícia${sources.length > 1 ? 's' : ''} • Ordenadas por relevância</p>
+        <strong style="color: #93c5fd; font-size: 1.2rem;">Fontes Verificadas</strong>
+        <p style="margin: 0.5rem 0 0 0; color: #cbd5e1; font-size: 0.9rem;">
+          ${sources.length} fonte${sources.length > 1 ? 's' : ''} encontrada${sources.length > 1 ? 's' : ''}
+        </p>
       </div>
     </div>
   `;
   sourcesGrid.appendChild(title);
   
+  // Renderiza cada fonte com estrutura melhorada
   sources.forEach(source => {
     const card = document.createElement('a');
     card.href = source.url;
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
-    card.style.cssText = `display: block; padding: 1.5rem; background: #1a1a1a; border: 2px solid #3a3a3a; border-radius: 12px; text-decoration: none; transition: all 0.2s; cursor: pointer;`;
+    card.className = 'source-card';
     
-    card.onmouseenter = function() {
-      this.style.transform = 'translateY(-3px)';
-      this.style.borderColor = '#3b82f6';
-    };
-    card.onmouseleave = function() {
-      this.style.transform = 'translateY(0)';
-      this.style.borderColor = '#3a3a3a';
-    };
+    // Prepara a data formatada
+    const publishDate = source.publishedAt 
+      ? new Date(source.publishedAt).toLocaleDateString('pt-BR', { 
+          day: '2-digit', 
+          month: 'short', 
+          year: 'numeric' 
+        })
+      : '';
     
+    // Logo ou inicial
     const logoHTML = source.logoUrl 
-      ? `<img src="${source.logoUrl}" alt="${source.source}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: contain; background: #f9fafb; padding: 4px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div style="display: none; width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">${source.source.charAt(0)}</div>`
-      : `<div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">${source.source.charAt(0)}</div>`;
+      ? `<img src="${source.logoUrl}" alt="${source.source}" class="source-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+         <div class="source-logo-fallback" style="display: none;">${source.source.charAt(0).toUpperCase()}</div>`
+      : `<div class="source-logo-fallback">${source.source.charAt(0).toUpperCase()}</div>`;
     
-    const publishDate = source.publishedAt ? new Date(source.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
-    
+    // Estrutura hierárquica clara
     card.innerHTML = `
-      <div style="display: flex; gap: 1rem; align-items: start;">
-        <div style="flex-shrink: 0;">${logoHTML}</div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-weight: 700; color: #e5e5e5; margin-bottom: 0.25rem;">
-            ${source.source}
-          </div>
-          <div style="color: #9ca3af; font-size: 0.8rem; margin-bottom: 0.75rem;">
-            🌐 ${source.domain} ${publishDate ? `• 📅 ${publishDate}` : ''} • ${source.api}
-            ${source.semanticSimilarity ? `<br>📊 Relevância: ${source.semanticSimilarity.toFixed(0)}%` : ''}
-          </div>
-          <div style="color: #d1d5db; line-height: 1.5; margin-bottom: 0.75rem; font-weight: 500;">${source.title}</div>
-          ${source.description ? `<div style="color: #9ca3af; font-size: 0.9rem; line-height: 1.4; margin-bottom: 0.75rem;">${source.description.substring(0, 150)}${source.description.length > 150 ? '...' : ''}</div>` : ''}
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; background: #3b82f6; color: white; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
-            🔗 Ler notícia completa
-          </div>
+      <div class="source-logo-container">
+        ${logoHTML}
+      </div>
+      
+      <div class="source-content">
+        <!-- TÍTULO EM DESTAQUE -->
+        <h3 class="source-article-title">${source.title}</h3>
+        
+        <!-- METADADOS ORGANIZADOS -->
+        <div class="source-meta">
+          <span class="source-publisher">
+            <i class="ph ph-newspaper"></i> ${source.source}
+          </span>
+          ${publishDate ? `
+            <span class="source-date">
+              <i class="ph ph-calendar-blank"></i> ${publishDate}
+            </span>
+          ` : ''}
+        </div>
+        
+        <!-- DESCRIÇÃO (SE HOUVER) -->
+        ${source.description ? `
+          <p class="source-description">
+            ${source.description.substring(0, 150)}${source.description.length > 150 ? '...' : ''}
+          </p>
+        ` : ''}
+        
+        <!-- CTA -->
+        <div class="source-cta">
+          <span>Ler notícia completa</span>
+          <i class="ph ph-arrow-right"></i>
         </div>
       </div>
     `;
+    
     sourcesGrid.appendChild(card);
   });
 }
 
-function updateVerificationStatus(message) {
-  if (verificationBox && verificationBox.querySelector('.verification-loading')) {
-    const el = verificationBox.querySelector('.verification-loading span:first-child');
-    if (el) el.textContent = message;
-  }
+// ==========================================
+// ALTERNATIVA: Renderização ULTRA-SIMPLIFICADA
+// (Use esta se preferir um design mais limpo)
+// ==========================================
+
+function renderSourcesSimplified(sources) {
+  sourcesGrid.innerHTML = '';
+  if (sources.length === 0) return;
+  
+  // Título
+  const header = document.createElement('div');
+  header.className = 'sources-header';
+  header.innerHTML = `
+    <h2>
+      <i class="ph-bold ph-newspaper"></i>
+      Fontes Verificadas (${sources.length})
+    </h2>
+  `;
+  sourcesGrid.appendChild(header);
+  
+  // Cards simplificados
+  sources.forEach(source => {
+    const card = document.createElement('a');
+    card.href = source.url;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
+    card.className = 'source-card-simple';
+    
+    const date = source.publishedAt 
+      ? new Date(source.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+      : '';
+    
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="publisher-badge">${source.source}</span>
+        ${date ? `<span class="date-badge">${date}</span>` : ''}
+      </div>
+      
+      <h3 class="article-title">${source.title}</h3>
+      
+      <div class="card-footer">
+        <span class="read-more">
+          Ler completa <i class="ph ph-arrow-up-right"></i>
+        </span>
+      </div>
+    `;
+    
+    sourcesGrid.appendChild(card);
+  });
 }
 
 // ==========================================
-// RATE LIMITER MELHORADO
+// GRÁFICO DE CONFIABILIDADE DINÂMICO
 // ==========================================
+
+let trustChartInstance = null; // Armazena a instância do gráfico
+
+/**
+ * Renderiza o gráfico de confiabilidade
+ * @param {string} level - Nível de confiabilidade (ALTA, MEDIA, NEUTRA, BAIXA)
+ * @param {number} confidence - Percentual de confiança da análise
+ */
+function renderTrustChart(level, confidence = 70) {
+  // Remove gráfico anterior se existir
+  const oldChart = document.getElementById('trustChartContainer');
+  if (oldChart) oldChart.remove();
+  
+  // Destrói instância anterior do Chart.js
+  if (trustChartInstance) {
+    trustChartInstance.destroy();
+    trustChartInstance = null;
+  }
+  
+  // Cria o container do gráfico
+  const chartContainer = document.createElement('div');
+  chartContainer.id = 'trustChartContainer';
+  chartContainer.className = 'trust-chart-container';
+  
+  chartContainer.innerHTML = `
+    <h3 class="chart-title">📊 Análise Visual da Confiabilidade</h3>
+    <div class="chart-canvas-wrapper">
+      <canvas id="trustChart"></canvas>
+    </div>
+  `;
+  
+  // Insere após o feedback box
+  const feedbackBox = document.querySelector('.feedback-box');
+  feedbackBox.parentNode.insertBefore(chartContainer, feedbackBox.nextSibling);
+  
+  // Calcula as porcentagens baseado no nível
+  let chartData = {
+    alta: 0,
+    media: 0,
+    neutra: 0,
+    baixa: 0
+  };
+  
+  // Distribui porcentagens de forma inteligente baseado no nível e confiança
+  switch(level) {
+    case 'ALTA':
+      chartData.alta = confidence;
+      chartData.media = Math.round((100 - confidence) * 0.6);
+      chartData.neutra = Math.round((100 - confidence) * 0.3);
+      chartData.baixa = 100 - chartData.alta - chartData.media - chartData.neutra;
+      break;
+    case 'MEDIA':
+      chartData.media = confidence;
+      chartData.alta = Math.round((100 - confidence) * 0.4);
+      chartData.neutra = Math.round((100 - confidence) * 0.35);
+      chartData.baixa = 100 - chartData.alta - chartData.media - chartData.neutra;
+      break;
+    case 'NEUTRA':
+      chartData.neutra = confidence;
+      chartData.media = Math.round((100 - confidence) * 0.45);
+      chartData.alta = Math.round((100 - confidence) * 0.3);
+      chartData.baixa = 100 - chartData.alta - chartData.media - chartData.neutra;
+      break;
+    case 'BAIXA':
+      chartData.baixa = confidence;
+      chartData.neutra = Math.round((100 - confidence) * 0.4);
+      chartData.media = Math.round((100 - confidence) * 0.35);
+      chartData.alta = 100 - chartData.baixa - chartData.media - chartData.neutra;
+      break;
+  }
+  
+  // Configuração do gráfico
+  const ctx = document.getElementById('trustChart').getContext('2d');
+  
+  trustChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Alta', 'Média', 'Neutra', 'Baixa'],
+      datasets: [{
+        data: [chartData.alta, chartData.media, chartData.neutra, chartData.baixa],
+        backgroundColor: [
+          '#00b894', // Alta - Verde
+          '#fdcb6e', // Média - Amarelo
+          '#6c5ce7', // Neutra - Roxo
+          '#d63031'  // Baixa - Vermelho
+        ],
+        borderColor: '#1e1e2e',
+        borderWidth: 3,
+        hoverOffset: 15
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#c3d1f7',
+            font: {
+              size: 14,
+              family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+              weight: '600'
+            },
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(30, 30, 46, 0.95)',
+          titleColor: '#c3d1f7',
+          bodyColor: '#c3d1f7',
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          padding: 12,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + '%';
+            }
+          }
+        }
+      },
+      animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 1500,
+        easing: 'easeOutQuart'
+      }
+    }
+  });
+  
+  console.log('📊 Gráfico renderizado:', { level, confidence, data: chartData });
+}
+
+// ==========================================
+// DICAS EDUCATIVAS
+// ==========================================
+
+const confiaTips = {
+  ALTA: [
+    "✅ Notícia verificada! Mesmo assim, sempre cite a fonte ao compartilhar.",
+    "💡 Fontes confiáveis confirmam, mas sempre verifique a data da publicação.",
+    "📚 Boa prática: Leia a notícia completa antes de compartilhar apenas o título."
+  ],
+  MEDIA: [
+    "⚠️ Verifique em múltiplas fontes antes de considerar como verdade absoluta.",
+    "🔍 Busque confirmação em veículos tradicionais como G1, Folha, BBC ou Estadão.",
+    "💡 Desconfie se apenas um veículo divulgou. Aguarde mais confirmações."
+  ],
+  NEUTRA: [
+    "🔍 Sem confirmação ampla. Pode ser notícia local, recente ou sem cobertura.",
+    "⏰ Notícias muito recentes podem ainda não ter sido verificadas amplamente.",
+    "📍 Notícias locais muitas vezes não aparecem em APIs nacionais."
+  ],
+  BAIXA: [
+    "🚨 NÃO COMPARTILHE. Verifique em fact-checkers como Aos Fatos, Lupa ou Comprova.",
+    "❌ Desconfie de linguagem emocional excessiva, urgência artificial e promessas irreais.",
+    "📚 Evite cair em clickbait. Leia a notícia completa e verifique a fonte."
+  ]
+};
+
+function showConfiaTip(level) {
+  if (!confiaTip || !tipText) return;
+  
+  const tips = confiaTips[level] || confiaTips['NEUTRA'];
+  const randomTip = tips[Math.floor(Math.random() * tips.length)];
+  
+  tipText.textContent = randomTip;
+  confiaTip.style.display = 'block';
+}
+
+// ==========================================
+// RATE LIMITER
+// ==========================================
+
 const rateLimiter = {
   requests: {
     search: [],
@@ -1318,6 +2006,7 @@ const rateLimiter = {
 // ==========================================
 // HANDLE SEARCH
 // ==========================================
+
 async function handleSearch() {
   const query = searchInput.value.trim();
   
@@ -1330,7 +2019,7 @@ async function handleSearch() {
   
   const validation = validateInput(cleanQuery);
   if (!validation.valid) {
-    alert('❌ ' + validation.errors.join('\n'));
+    alert(validation.errors.join('\n'));
     return;
   }
   
@@ -1341,6 +2030,15 @@ async function handleSearch() {
   
   const old = document.getElementById('extractedTextBox');
   if (old) old.remove();
+  
+  // Remove gráfico anterior
+  const oldChart = document.getElementById('trustChartContainer');
+  if (oldChart) oldChart.remove();
+  
+  // Oculta o widget de notícias recentes durante a análise
+  if (recentNewsWidget) {
+    recentNewsWidget.style.display = 'none';
+  }
   
   resultsSection.classList.add('active');
   verificationBox.style.display = 'block';
@@ -1360,7 +2058,18 @@ async function handleSearch() {
     analytics.logSearch(cleanQuery, analysis.nivel, sources.length);
     
     renderFeedback(analysis, sources);
+    
+    // Renderiza o gráfico de confiabilidade
+    renderTrustChart(analysis.nivel, analysis.confidence || 70);
+    
     renderSources(sources);
+    showConfiaTip(analysis.nivel);
+    
+    // Move o widget de notícias recentes para baixo dos resultados
+    if (recentNewsWidget && resultsSection) {
+      recentNewsWidget.style.display = 'block';
+      resultsSection.appendChild(recentNewsWidget);
+    }
     
   } catch (error) {
     console.error('❌ Erro na análise:', error);
@@ -1373,6 +2082,11 @@ async function handleSearch() {
         <p style="color: #9ca3af; margin-top: 1rem;">${error.message || 'Tente novamente em alguns instantes.'}</p>
       </div>
     `;
+    
+    // Reexibe o widget de notícias em caso de erro
+    if (recentNewsWidget) {
+      recentNewsWidget.style.display = 'block';
+    }
   }
 }
 
@@ -1384,45 +2098,82 @@ if (searchInput) {
 }
 
 // ==========================================
-// ANALYTICS
+// WIDGET DE NOTÍCIAS RECENTES
 // ==========================================
-const analytics = {
-  totalSearches: 0,
-  classifications: { ALTA: 0, MEDIA: 0, NEUTRA: 0, BAIXA: 0 },
+
+async function loadRecentNews() {
+  if (!recentNewsList) return;
   
-  logSearch(query, level, sourcesCount) {
-    this.totalSearches++;
-    this.classifications[level]++;
+  try {
+    const url = `https://newsdata.io/api/1/news?apikey=${API_KEYS.newsdata}&language=pt&country=br&category=top`;
     
-    console.log('📊 Estatísticas:', { 
-      total: this.totalSearches, 
-      nivel: level, 
-      fontes: sourcesCount,
-      distribuicao: this.classifications 
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao carregar notícias');
+    }
+    
+    const data = await response.json();
+    
+    if (!data.results || data.results.length === 0) {
+      recentNewsList.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 1rem;">Nenhuma notícia disponível no momento.</div>';
+      return;
+    }
+    
+    const newsHTML = data.results.slice(0, 5).map(news => `
+      <a href="${news.link}" target="_blank" rel="noopener noreferrer" class="widget-news-item">
+        <div class="widget-news-title">${news.title}</div>
+        <div class="widget-news-source">${news.source_id || 'Fonte desconhecida'}</div>
+      </a>
+    `).join('');
+    
+    recentNewsList.innerHTML = newsHTML;
+    
+    console.log('✅ Notícias recentes carregadas');
+  } catch (error) {
+    console.error('❌ Erro ao carregar notícias recentes:', error);
+    recentNewsList.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 1rem;">⚠️ Erro ao carregar notícias</div>';
+  }
+}
+
+// Carrega notícias recentes ao iniciar
+loadRecentNews();
+
+// ==========================================
+// STATUS DA API (REMOVIDO - NÃO EXIBE MAIS)
+// ==========================================
+
+async function checkAPIStatus() {
+  // Verifica silenciosamente no console apenas
+  if (!apiStatus) return;
+  
+  // Oculta o componente de status da API
+  if (apiStatus) {
+    apiStatus.style.display = 'none';
+  }
+  
+  try {
+    const response = await fetch(`https://newsdata.io/api/1/news?apikey=${API_KEYS.newsdata}&language=pt&country=br`, {
+      method: 'HEAD'
     });
     
-    if (this.totalSearches % 10 === 0) {
-      console.log('📈 Milestone: 10 análises realizadas');
-      console.log('📊 Distribuição:', this.classifications);
+    if (response.ok) {
+      console.log('✅ API NewsData.io online');
+    } else {
+      throw new Error('API offline');
     }
-  },
-  
-  getStats() {
-    return {
-      total: this.totalSearches,
-      classifications: this.classifications,
-      avgPerLevel: Object.entries(this.classifications).map(([k, v]) => ({
-        nivel: k,
-        count: v,
-        percentage: ((v / this.totalSearches) * 100).toFixed(1) + '%'
-      }))
-    };
+  } catch (error) {
+    console.warn('⚠️ API NewsData.io offline ou instável');
   }
-};
+}
+
+// Verifica status da API ao iniciar (silenciosamente)
+checkAPIStatus();
 
 // ==========================================
 // LIMPEZA DE CACHE AUTOMÁTICA
 // ==========================================
+
 setInterval(() => {
   const now = Date.now();
   let removed = 0;
@@ -1442,12 +2193,14 @@ setInterval(() => {
 // ==========================================
 // HEALTH CHECK DO SISTEMA
 // ==========================================
+
 function healthCheck() {
   const checks = {
     dom: !!(searchInput && searchBtn && resultsSection && verificationBox),
     apis: Object.values(API_KEYS).every(key => key && key.length > 10),
     cache: searchCache instanceof Map,
-    rateLimiter: typeof rateLimiter.canMakeRequest === 'function'
+    rateLimiter: typeof rateLimiter.canMakeRequest === 'function',
+    analytics: typeof analytics.logSearch === 'function'
   };
   
   const healthy = Object.values(checks).every(v => v === true);
@@ -1463,8 +2216,9 @@ function healthCheck() {
 // ==========================================
 // INICIALIZAÇÃO DO SISTEMA
 // ==========================================
+
 console.log('═══════════════════════════════════════');
-console.log('✅ ConfIA v8.0 - Sistema RIGOROSO Carregado!');
+console.log('✅ ConfIA v9.0 - Sistema Educativo e Blindado!');
 console.log('═══════════════════════════════════════');
 console.log('');
 console.log('🔑 APIs Configuradas:');
@@ -1484,8 +2238,14 @@ console.log('  ✓ Cache inteligente (5min)');
 console.log('  ✓ Rate limiting (8 buscas/min, 3 OCR/min)');
 console.log('  ✓ Busca paralela em 2 APIs');
 console.log('  ✓ Timeout de 8 segundos por API');
+console.log('  ✓ Histórico local (últimas 10 análises)');
+console.log('  ✓ Dashboard de estatísticas');
+console.log('  ✓ Dicas educativas contextuais');
+console.log('  ✓ Widget de notícias reais recentes');
+console.log('  ✓ Status da API em tempo real');
+console.log('  ✓ Modais informativos (Como funciona, Sobre, Histórico, Estatísticas)');
 console.log('');
-console.log('🛡️ Melhorias RIGOROSAS v8.0:');
+console.log('🛡️ Melhorias RIGOROSAS v9.0:');
 console.log('  ✓ Threshold de absurdidade: 25 → 50 pts (crítico)');
 console.log('  ✓ Detecção "dinheiro grátis": 85 pontos');
 console.log('  ✓ Detecção "CORRE!!": 45 pontos');
@@ -1493,6 +2253,8 @@ console.log('  ✓ CAPS LOCK > 25%: penalidade alta');
 console.log('  ✓ 2+ exclamações: penalização automática');
 console.log('  ✓ Classificação BAIXA mais sensível');
 console.log('  ✓ Sem fontes + sensacionalismo = BAIXA');
+console.log('  ✓ Sistema educativo com dicas contextuais');
+console.log('  ✓ Persistência de dados (localStorage)');
 console.log('');
 console.log('🎯 Detecção de Fake News RIGOROSA:');
 console.log('  ✓ Teorias conspiratórias');
@@ -1503,24 +2265,49 @@ console.log('  ✓ Impossibilidades físicas/temporais');
 console.log('  ✓ Urgência artificial detectada');
 console.log('  ✓ Análise de consenso entre fontes');
 console.log('');
-console.log('📊 Analytics:');
+console.log('📊 Analytics e Histórico:');
 console.log('  ✓ Rastreamento de classificações');
-console.log('  ✓ Estatísticas de uso');
+console.log('  ✓ Estatísticas de uso persistentes');
+console.log('  ✓ Histórico local das últimas 10 análises');
 console.log('  ✓ Performance monitoring');
+console.log('  ✓ Dashboard visual com gráficos');
+console.log('');
+console.log('🎓 Recursos Educativos:');
+console.log('  ✓ Dicas ConfIA contextuais por nível');
+console.log('  ✓ Explicações detalhadas dos fatores de análise');
+console.log('  ✓ Recomendações práticas de verificação');
+console.log('  ✓ Links para fact-checkers confiáveis');
+console.log('  ✓ Orientações sobre identificação de fake news');
 console.log('');
 
 setTimeout(() => {
   const healthy = healthCheck();
   if (!healthy) {
     console.error('⚠️ Sistema com problemas detectados!');
+  } else {
+    console.log('✅ Todos os sistemas operacionais!');
+  }
+  
+  // Exibe estatísticas carregadas
+  const stats = analytics.getStats();
+  if (stats.total > 0) {
+    console.log('');
+    console.log('📈 Estatísticas Carregadas do Histórico:');
+    console.log(`  • Total de análises: ${stats.total}`);
+    console.log(`  • Alta confiabilidade: ${stats.classifications.ALTA}`);
+    console.log(`  • Média confiabilidade: ${stats.classifications.MEDIA}`);
+    console.log(`  • Neutra: ${stats.classifications.NEUTRA}`);
+    console.log(`  • Baixa confiabilidade: ${stats.classifications.BAIXA}`);
   }
 }, 1000);
 
 // ==========================================
 // UTILITÁRIOS DE DEBUG
 // ==========================================
+
 window.ConfIADebug = {
   getStats: () => analytics.getStats(),
+  getHistory: () => getHistory(),
   getCache: () => ({
     size: searchCache.size,
     keys: Array.from(searchCache.keys())
@@ -1542,8 +2329,25 @@ window.ConfIADebug = {
     searchCache.clear();
     console.log(`🧹 Cache limpo: ${size} entrada(s) removida(s)`);
   },
+  clearHistory: () => {
+    clearHistory();
+    console.log('🧹 Histórico limpo');
+  },
+  clearStats: () => {
+    analytics.totalSearches = 0;
+    analytics.classifications = { ALTA: 0, MEDIA: 0, NEUTRA: 0, BAIXA: 0 };
+    analytics.saveStats();
+    console.log('🧹 Estatísticas limpas');
+  },
+  clearAll: () => {
+    window.ConfIADebug.clearCache();
+    window.ConfIADebug.clearHistory();
+    window.ConfIADebug.clearStats();
+    console.log('🧹 Todos os dados locais limpos');
+  },
   healthCheck: healthCheck,
-  version: '8.0 RIGOROSO',
+  checkAPI: checkAPIStatus,
+  version: '9.0 EDUCATIVO E BLINDADO',
   features: [
     'Validação reforçada',
     'Detecção RIGOROSA de fake news',
@@ -1552,13 +2356,46 @@ window.ConfIADebug = {
     'Priorização de fontes tier 1',
     'Rate limiting aprimorado',
     'Penalizações mais severas',
-    'Classificação BAIXA mais sensível'
+    'Classificação BAIXA mais sensível',
+    'Histórico local persistente',
+    'Dashboard de estatísticas',
+    'Dicas educativas contextuais',
+    'Widget de notícias reais',
+    'Status da API em tempo real',
+    'Modais informativos completos',
+    'Sistema 100% educativo e pedagógico'
   ]
 };
 
 console.log('');
 console.log('💡 Dica: Use window.ConfIADebug para acessar ferramentas de debug');
-console.log('   Exemplo: window.ConfIADebug.getStats()');
+console.log('   Exemplos:');
+console.log('   - window.ConfIADebug.getStats() // Ver estatísticas');
+console.log('   - window.ConfIADebug.getHistory() // Ver histórico');
+console.log('   - window.ConfIADebug.clearAll() // Limpar tudo');
+console.log('   - window.ConfIADebug.healthCheck() // Verificar saúde do sistema');
 console.log('');
-console.log('⚠️ MODO RIGOROSO: Fake news será classificada como BAIXA');
+console.log('⚠️ MODO RIGOROSO ATIVADO: Fake news será classificada como BAIXA');
+console.log('🎓 MODO EDUCATIVO ATIVADO: Dicas contextuais e recursos pedagógicos');
 console.log('═══════════════════════════════════════');
+
+// ==========================================
+// INFORMAÇÕES ADICIONAIS AO USUÁRIO
+// ==========================================
+
+// Adiciona informações de versão no console para desenvolvedores
+console.log('');
+console.log('%c🛡️ ConfIA v9.0 - Sistema de Verificação de Fake News', 'color: #3b82f6; font-size: 16px; font-weight: bold;');
+console.log('%cDesenvolvido com foco em educação e combate à desinformação', 'color: #9ca3af; font-size: 12px;');
+console.log('%cTecnologias: Gemini AI, NewsData.io, Currents API, OCR.space', 'color: #9ca3af; font-size: 12px;');
+console.log('');
+
+// ==========================================
+// MENSAGEM FINAL
+// ==========================================
+
+console.log('🚀 Sistema pronto para uso!');
+console.log('💡 Digite uma notícia no campo de busca ou faça upload de uma imagem com texto.');
+console.log('📚 Explore os modais "Como funciona?" e "Sobre" para aprender mais.');
+console.log('📊 Acompanhe suas análises no histórico e estatísticas.');
+console.log('');
