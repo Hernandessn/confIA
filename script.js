@@ -10,7 +10,7 @@ const API_KEYS = {
   gemini: 'AIzaSyBqBVTSzHb2SbnFgnDnVeo4hvyoRG39sro',
   newsdata: 'pub_6dde2ebc4986466d82e1b5ac725fa99a',
   currents: 'CFpXp_zt6b7-MrwMlDsR8z15MqxySjHLLNWaB3RwCVbAJeyt',
-  ocrspace: 'K86239280388957'
+  ocrspace: 'K88448454588957'
 };
 
 // ==========================================
@@ -61,7 +61,7 @@ const modalData = {
     icon: '⚙️',
     title: 'Como funciona o ConfIA?',
     content: `
-      <p>O ConfIA utiliza <strong>Inteligência Artificial</strong> (Google Gemini 2.0) e <strong>APIs de notícias</strong> para verificar manchetes e avaliar sua confiabilidade.</p>
+      <p>O ConfIA utiliza <strong>Inteligência Artificial</strong> (Google Gemini) e <strong>API de notícia</strong> para verificar manchetes e avaliar sua confiabilidade.</p>
       
       <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🔍 Sistema de Análise em 3 Camadas:</h3>
       <ul style="line-height: 2; padding-left: 1.5rem;">
@@ -104,10 +104,10 @@ const modalData = {
 
       <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">🛠️ Tecnologias Utilizadas:</h3>
       <ul style="line-height: 2; padding-left: 1.5rem;">
-        <li><strong>Google Gemini 2.0 Flash:</strong> Análise de linguagem natural</li>
-        <li><strong>NewsData.io:</strong> Base de notícias brasileiras</li>
-        <li><strong>Currents API:</strong> Notícias internacionais</li>
-        <li><strong>OCR.space:</strong> Extração de texto de imagens</li>
+        <li><strong>Google Gemini:</strong> Análise de linguagem natural.</li>
+        <li><strong>NewsData.io:</strong> Base de notícias brasileiras.</li>
+        <li><strong>OCR.space:</strong> Extração de texto de imagens.</li>
+        <li><strong>Chart.js:</strong> Visualização interativa de dados e gráficos dinâmicos diretamente no navegador.</li>
       </ul>
 
       <h3 style="color: #3b82f6; margin-top: 1.5rem; margin-bottom: 0.75rem;">📚 Dicas para Identificar Fake News:</h3>
@@ -517,7 +517,6 @@ if (searchInput) {
 // ==========================================
 // SISTEMA DE UPLOAD E OCR
 // ==========================================
-
 function validateImage(file) {
   const errors = [];
   
@@ -526,15 +525,15 @@ function validateImage(file) {
     errors.push('❌ Formato inválido. Use apenas JPG ou PNG.');
   }
   
-  const maxSize = 10 * 1024 * 1024;
-  const minSize = 50 * 1024;
+  const maxSize = 10 * 1024 * 1024;  // 10MB
+  const minSize = 10 * 1024;          // ✅ REDUZIDO: 10KB em vez de 50KB
   
   if (file.size > maxSize) {
     errors.push(`❌ Imagem muito grande (${(file.size/1024/1024).toFixed(1)}MB). Máximo: 10MB.`);
   }
   
   if (file.size < minSize) {
-    errors.push('❌ Imagem muito pequena. Pode estar corrompida ou sem conteúdo.');
+    errors.push('❌ Imagem muito pequena ou corrompida. Tente uma imagem maior.');
   }
   
   return { valid: errors.length === 0, errors };
@@ -1750,7 +1749,7 @@ function renderSourcesSimplified(sources) {
   header.innerHTML = `
     <h2>
       <i class="ph-bold ph-newspaper"></i>
-      Fontes Verificadas (${sources.length})
+      Notícias Relacionadas(${sources.length})
     </h2>
   `;
   sourcesGrid.appendChild(header);
