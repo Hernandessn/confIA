@@ -1661,7 +1661,7 @@ function renderSources(sources) {
     <div style="display: flex; align-items: center; gap: 0.75rem;">
       <span style="font-size: 1.8rem;">📰</span>
       <div>
-        <strong style="color: #93c5fd; font-size: 1.2rem;">Fontes Verificadas</strong>
+        <strong style="color: #93c5fd; font-size: 1.2rem;">Notícias Relacionadas</strong>
         <p style="margin: 0.5rem 0 0 0; color: #cbd5e1; font-size: 0.9rem;">
           ${sources.length} fonte${sources.length > 1 ? 's' : ''} encontrada${sources.length > 1 ? 's' : ''}
         </p>
