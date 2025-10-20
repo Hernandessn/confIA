@@ -1,10 +1,10 @@
-# 🧠 ConfIA — Detector Inteligente de Fake News
+# 🧠 ConfIA — Sistema Educativo de Verificação de Fake News
 
 <img src="./public/screenshots/logo-screenshots.png" width="300" align="left" />
 
-O **ConfIA** (de "confiança" e "IA") é um detector inteligente de **fake news** que analisa manchetes e notícias em tempo real, usando **IA Gemini** e **APIs de notícias** confiáveis.
+O **ConfIA** (de "confiança" e "IA") é um sistema educativo inteligente de **verificação de fake news** que analisa manchetes e notícias em tempo real, usando **IA Gemini 2.0 Flash**, **APIs de notícias confiáveis** e **técnicas avançadas de detecção de desinformação**.
 
-Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explicando o motivo e mostrando as fontes analisadas.
+Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explicando o motivo, mostrando as fontes analisadas e fornecendo **dicas educativas** para desenvolver o pensamento crítico.
 
 > ⚡ Projeto desenvolvido para a **Maratona Tech 2025**, unindo tecnologia, ética digital e pensamento computacional.
 
@@ -12,206 +12,211 @@ Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explic
 
 ## 🚀 Funcionalidades Principais
 
+### 🔍 Verificação Inteligente
 ✅ Verifica manchetes em **texto ou imagem (OCR)**  
-✅ Analisa o contexto com a **IA Gemini 2.0**  
-✅ Consulta notícias reais em **NewsData.io e Currents API**  
+✅ Analisa contexto com a **IA Gemini 2.0 Flash Exp**  
+✅ Consulta notícias reais em **NewsData.io**  
 ✅ Classifica em **Alta, Média, Neutra ou Baixa Confiabilidade**  
-✅ Detecta **linguagem sensacionalista e clickbait**  
-✅ Sistema de **pontuação de absurdos** (fake news perigosas)  
-✅ **Análise semântica contextual** das fontes  
-✅ Mostra **fontes reais** com logos, links e datas  
-✅ Interface moderna inspirada no estilo do **ChatGPT**  
+✅ Sistema de **análise em 3 camadas** (Semântica, Comportamental, Lógica)  
+
+### 🛡️ Detecção Avançada
+✅ Detecta **linguagem sensacionalista e clickbait** (score de 0-100 pts)  
+✅ Sistema de **pontuação de absurdos** para fake news perigosas (0-100 pts)  
+✅ **Análise semântica contextual** com similaridade entre texto e fontes  
+✅ Identificação de **teorias conspiratórias conhecidas**  
+✅ Detecção de **promessas irreais e impossibilidades físicas**  
+
+### 📊 Recursos Educativos
+✅ **Dicas ConfIA** contextualizadas por nível de confiabilidade  
+✅ **Histórico local** das últimas 10 verificações (persistente)  
+✅ **Dashboard de estatísticas** com gráficos visuais (Chart.js)  
+✅ **Gráfico de confiabilidade dinâmico** para cada análise  
+✅ **Modais informativos** (Como funciona, Sobre, Histórico, Estatísticas)  
+✅ **Widget de notícias reais recentes** do Brasil  
+
+### 🎨 Interface Moderna
+✅ Design inspirado em **ChatGPT e Claude**  
+✅ **Modo escuro otimizado** com gradientes modernos  
+✅ **Animações suaves** e feedback visual  
+✅ **Responsivo** — funciona perfeitamente em desktop e mobile  
+✅ **Logos das fontes** com fallback automático  
+
+### ⚡ Otimizações Técnicas
 ✅ **100% Frontend** — roda direto no navegador  
 ✅ **Cache inteligente** (5 minutos) para otimizar requisições  
-✅ Logs explicativos no console para debug  
+✅ **Rate limiting** (8 buscas/min, 3 OCR/min)  
+✅ **Busca paralela** em múltiplas APIs  
+✅ **Timeout de 8 segundos** por API com fallback  
+✅ **Compressão automática de imagens** para OCR  
+✅ Logs detalhados no console para debug  
 
 ---
 
 ## 💡 Como Funciona
 
-1. O usuário insere uma **manchete ou imagem**.  
-2. O sistema extrai o texto (caso seja imagem via OCR).  
-3. Keywords são extraídas automaticamente do texto.  
-4. **Busca paralela** em 2 APIs de notícias (NewsData.io + Currents).  
-5. **Análise semântica** compara o texto original com as fontes encontradas.  
-6. A **IA Gemini 2.0** interpreta contexto, linguagem e coerência.  
-7. O ConfIA mostra o **nível de confiabilidade** com explicações detalhadas.  
+### 🔄 Fluxo de Análise (3 Camadas)
 
-> ⚠️ O ConfIA verifica apenas notícias amplamente divulgadas em portais nacionais e internacionais.  
-> Notícias locais ou muito recentes podem não ter cobertura ainda.
+1. **Entrada do Usuário**
+   - Digitação de texto (máx 500 caracteres)
+   - Upload de imagem (JPG/PNG, máx 10MB)
+
+2. **Processamento de Entrada**
+   - Validação e sanitização do texto
+   - OCR para extração de texto de imagens (OCR.space)
+   - Compressão automática de imagens grandes
+
+3. **Extração de Keywords**
+   - Identificação de nomes próprios
+   - Filtragem de stopwords
+   - Priorização por relevância
+
+4. **Busca de Fontes**
+   - NewsData.io (notícias brasileiras)
+   - Cache inteligente de 5 minutos
+   - Timeout de 8 segundos com fallback
+
+5. **Análise em 3 Camadas**
+   
+   **🔍 Camada Semântica**
+   - Cálculo de similaridade contextual (0-100%)
+   - Identificação de fontes relevantes
+   - Contagem de fontes tier-1 (G1, Folha, BBC, etc.)
+   
+   **🚨 Camada Comportamental**
+   - Detecção de sensacionalismo (0-100 pts)
+   - Identificação de clickbait
+   - Análise de urgência artificial
+   - Detecção de excesso de MAIÚSCULAS e pontuação
+   
+   **⚠️ Camada Lógica**
+   - Detecção de absurdos (0-100 pts)
+   - Identificação de promessas irreais
+   - Teorias conspiratórias conhecidas
+   - Impossibilidades físicas/temporais
+
+6. **Análise com IA Gemini**
+   - Interpretação contextual aprofundada
+   - Geração de explicação educativa
+   - Recomendações práticas
+   - Manutenção da classificação rigorosa
+
+7. **Classificação Rigorosa**
+   - Sistema de pontuação multi-fatorial
+   - Penalizações por sinais de alerta
+   - Confiança da análise (45-95%)
+   - 4 níveis de confiabilidade
+
+8. **Feedback Visual**
+   - Explicação detalhada
+   - Gráfico de confiabilidade (Chart.js)
+   - Fontes verificadas com logos
+   - Dicas educativas contextualizadas
 
 ---
+
 
 ## 🧩 Pilares do Pensamento Computacional Aplicados
 
-| Pilar | Aplicação no ConfIA |
-|-------|----------------------|
-| **Decomposição** | Separação das etapas de análise: OCR, extração de keywords, APIs, análise semântica, IA e exibição dos resultados. |
-| **Reconhecimento de Padrões** | Identificação de linguagem sensacionalista, clickbait, fake news perigosas e padrões contextuais nas fontes. |
-| **Abstração** | Foco apenas nas informações essenciais (texto da notícia, keywords relevantes e fontes verificadas). |
-| **Algoritmo** | Sequência de passos automatizados desde o input até o resultado final, com cache e fallback inteligente. |
+| Pilar | Aplicação no ConfIA v9.0 |
+|-------|---------------------------|
+| **Decomposição** | Sistema modular dividido em: validação, OCR, extração de keywords, busca paralela, análise em 3 camadas, classificação rigorosa, renderização visual e persistência de dados. |
+| **Reconhecimento de Padrões** | Identificação avançada de sensacionalismo (10 padrões), absurdos (20 padrões), teorias conspiratórias, promessas irreais e análise semântica contextual. |
+| **Abstração** | Foco em métricas essenciais: similaridade contextual, scores de confiabilidade, relevância de fontes tier-1 e confiança da análise. |
+| **Algoritmo** | Sequência rigorosa e automatizada desde input até resultado final, com cache, rate limiting, fallback inteligente e sistema de penalizações multi-fatorial. |
 
 ---
 
-## 🔄 Fluxograma do Sistema
+## 🔄 Fluxograma do Sistema v9.0
 
-O diagrama abaixo representa o fluxo lógico do **ConfIA**, desde a entrada do usuário até a resposta final:
+O diagrama abaixo representa o fluxo lógico completo do **ConfIA v9.0**, incluindo as novas funcionalidades educativas:
 
-<p align="center">
-  <img src="./public/screenshots/Fluxograma-ConfIA.png" width="800" alt="Fluxograma ConfIA" />
-</p>
+<img src="https://github.com/Hernandessn/confIA/blob/main/public/screenshots/Fluxograma-ConfIA.png?raw=true"/>
 
-### 📘 Descrição do Fluxo:
 
-1. **Início →** O usuário entra no site.  
-2. **Entrada →** Digita uma manchete ou envia uma imagem.  
-3. **OCR (se imagem) →** Extrai o texto via OCR.space e envia para o sistema.  
-4. **Keywords →** Extração automática de palavras-chave relevantes.  
-5. **Busca Paralela →** NewsData.io + Currents API pesquisam fontes simultaneamente.  
-6. **Cache →** Verifica se a busca já foi feita recentemente (5min).  
-7. **Análise Semântica →** Compara similaridade contextual entre texto original e fontes.  
-8. **Detecção →** Identifica sensacionalismo, clickbait e fake news perigosas.  
-9. **IA Gemini →** Analisa e gera explicação final contextualizada.  
-10. **Classificação →** Define nível de confiabilidade (ALTA, MÉDIA, NEUTRA, BAIXA).  
-11. **Feedback →** Exibe resultado com explicação, pontos de atenção e fontes verificadas.  
-12. **Fim.**
+## 🛡️ Segurança e Privacidade
 
----
+### 🔒 Medidas de Segurança Implementadas
+✅ **Sanitização de entrada** — remove scripts e tags HTML  
+✅ **Validação rigorosa** — previne injeção de código  
+✅ **Rate limiting** — previne abuso da API  
+✅ **Timeouts** — evita travamentos  
+✅ **Fallback automático** — garante disponibilidade  
+✅ **Validação de imagens** — aceita apenas JPG/PNG  
+✅ **Compressão segura** — reduz tamanho sem perda de qualidade  
 
-## 🧰 Tecnologias Utilizadas
-
-| Categoria | Ferramenta |
-|------------|-------------|
-| Frontend | HTML5, CSS3, JavaScript ES6+ (Vanilla) |
-| IA | Google Gemini 2.0 Flash Exp |
-| APIs de Notícias | NewsData.io, Currents API |
-| OCR | OCR.space |
-| Hospedagem | Netlify |
-| Controle de Versão | Git + GitHub |
-| Otimizações | Cache em memória, busca paralela, fallback automático |
+### 🔐 Privacidade
+✅ **Sem rastreamento** — não coletamos dados pessoais  
+✅ **Sem cookies** — não usamos cookies de terceiros  
+✅ **Dados locais** — histórico salvo apenas no seu navegador  
+✅ **Sem cadastro** — uso 100% anônimo  
+✅ **Open source** — código auditável publicamente  
 
 ---
 
-## 🎯 Arquitetura do Sistema
+## 🌍 Impacto Social
+
+### 📊 Objetivos do Projeto
+1. **Educação Digital** — Ensinar identificação de fake news
+2. **Combate à Desinformação** — Reduzir compartilhamento de notícias falsas
+3. **Pensamento Crítico** — Desenvolver habilidades analíticas
+4. **Democratização** — Acesso gratuito a verificação de fatos
+5. **Transparência** — Mostrar como a análise é feita
+
+### 🎯 Público-Alvo
+- 📱 **Usuários de redes sociais** — que compartilham notícias
+- 🎓 **Estudantes** — aprendendo sobre mídia e jornalismo
+- 👨‍🏫 **Educadores** — ensinando alfabetização digital
+- 📰 **Jornalistas** — verificando informações rapidamente
+- 👴 **Idosos** — grupo mais vulnerável a fake news
+
+### 💡 Casos de Uso Educativo
+1. **Em sala de aula** — Atividades de fact-checking
+2. **Em workshops** — Treinamento de alfabetização midiática
+3. **Em palestras** — Demonstrações práticas
+4. **Em projetos** — Integração com sistemas educacionais
+5. **Em pesquisas** — Estudos sobre desinformação
+
+## 💬 FAQ (Perguntas Frequentes)
+
+### ❓ O ConfIA é 100% preciso?
+**Não.** Nenhum sistema automatizado é 100% preciso. O ConfIA é uma **ferramenta educativa** que ajuda a identificar sinais de fake news, mas a verificação final deve ser feita por humanos em fact-checkers confiáveis.
+
+### ❓ Por que minha notícia apareceu como "Neutra"?
+Notícias **muito recentes**, **regionais** ou **locais** podem não ter cobertura ampla ainda. Isso não significa que sejam falsas, apenas que não foram divulgadas amplamente.
+
+### ❓ Posso confiar 100% nas classificações?
+O ConfIA deve ser usado como **primeira análise**. Para informações críticas, sempre verifique em múltiplas fontes confiáveis e fact-checkers profissionais.
+
+### ❓ Como o ConfIA protege minha privacidade?
+Todos os dados ficam **apenas no seu navegador**. Não coletamos, armazenamos ou compartilhamos nenhuma informação pessoal.
+
+### ❓ Posso usar o ConfIA comercialmente?
+Sim! O projeto é open source (licença MIT). Você pode usar, modificar e distribuir livremente, desde que mantenha os créditos.
+
+### ❓ Como posso contribuir?
+Veja a seção **[Contribuindo](#-contribuindo)** acima. Pull requests são bem-vindos!
+
+### ❓ O ConfIA funciona offline?
+Não completamente. As APIs de notícias e IA requerem conexão. No futuro, planejamos um modo offline com cache avançado.
+
+### ❓ Quais notícias o ConfIA consegue verificar?
+O ConfIA funciona melhor com notícias de **alcance nacional/internacional**. Notícias locais, regionais ou muito recentes podem não aparecer.
+
+### ❓ O ConfIA detecta deepfakes?
+Atualmente, não. O foco é em análise textual. Detecção de deepfakes está no roadmap futuro (v10.0).
+
+### ❓ Posso integrar o ConfIA no meu site?
+No momento, não há API pública. Mas você pode embedar o site ou adaptar o código (open source). API pública está planejada para v10.0.
+
+---
+
+## 📞 Contato e Suporte
+
+### 💬 Canais de Comunicação
+- 📧 **Email**: hernandesneves07@gmail.com
+- 💼 **LinkedIn**: www.linkedin.com/in/hernandes-sales
+
 
 ```
-┌─────────────────────────────────────────────────┐
-│              FRONTEND (100%)                    │
-│  HTML + CSS + JavaScript Vanilla                │
-└─────────────────┬───────────────────────────────┘
-                  │
-    ┌─────────────┼─────────────┐
-    │             │             │
-    ▼             ▼             ▼
-┌────────┐  ┌──────────┐  ┌──────────┐
-│OCR.space│  │NewsData.io│  │Currents │
-│  API    │  │   API     │  │  API    │
-└────────┘  └──────────┘  └──────────┘
-    │             │             │
-    └─────────────┼─────────────┘
-                  │
-                  ▼
-          ┌──────────────┐
-          │  Gemini 2.0  │
-          │   (Análise)  │
-          └──────────────┘
-                  │
-                  ▼
-          ┌──────────────┐
-          │  Resultado   │
-          │   Visual     │
-          └──────────────┘
-```
 
 ---
-
-## 📊 Sistema de Análise Avançado
-
-### 🔍 Detecção de Sensacionalismo
-- Padrões de clickbait ("você não vai acreditar", "médicos odeiam")
-- Linguagem urgente/alarmista
-- Excesso de MAIÚSCULAS
-- Pontuação: 0-100 pts
-
-### 🚨 Detecção de Absurdos
-- Promessas irreais (ganhar dinheiro fácil)
-- Curas milagrosas
-- Teorias conspiratórias
-- Pontuação: 0-100 pts (crítico > 50pts)
-
-### 🎯 Análise Contextual
-- Similaridade semântica: compara texto original com fontes
-- Relevância das fontes: verifica se falam do mesmo assunto
-- Classificação: HIGH, MEDIUM, LOW, NONE
-
-### 📈 Classificação Final
-| Nível | Critérios |
-|-------|-----------|
-| **ALTA** | 3+ fontes tier-1 + alta similaridade contextual |
-| **MÉDIA** | 2+ fontes + relevância moderada OU sensacionalismo leve |
-| **NEUTRA** | 1 fonte OU sem fontes mas sem sinais de alerta |
-| **BAIXA** | Absurdos críticos OU sensacionalismo extremo sem fontes |
-
----
-
-## 📸 Interface
-
-<p align="center">
-  <img src="./public/screenshots/interface-desktop.png" width="800" alt="Interface ConfIA Desktop" />
-  <img src="./public/screenshots/interface-celular.png" width="300" alt="Interface ConfIA Mobile" /> 
-</p>
-
----
-
-## 🔗 Link do Projeto
-
-🌐 **[ConfIA - Acesse aqui](https://conf-ia.netlify.app/)**
-
----
-
-## ⚙️ Limites e Otimizações
-
-### 📊 Limites das APIs (Plano Gratuito)
-- **NewsData.io**: 200 requisições/dia
-- **Currents API**: 600 requisições/dia
-- **Gemini API**: ~1500 requisições/dia
-- **OCR.space**: 25.000 requisições/mês
-
-### 🚀 Otimizações Implementadas
-- ✅ **Cache de 5 minutos**: evita requisições duplicadas
-- ✅ **Busca paralela**: NewsData + Currents ao mesmo tempo
-- ✅ **Fallback automático**: se uma API falhar, continua com a outra
-- ✅ **Rate limiting frontend**: máximo 10 buscas/minuto por usuário
-- ✅ **Compressão de imagens**: reduz tamanho antes do OCR
-
----
-
-## 🛠️ Como Rodar Localmente
-
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/confia.git
-
-# Entre na pasta
-cd confia
-
-# Abra o index.html no navegador
-# Ou use um servidor local como Live Server (VS Code)
-```
-
-> **Nota**: Não precisa instalar dependências — é 100% frontend!
-
----
-
-## 📝 Estrutura do Projeto
-
-```
-confia/
-├── index.html          # Página principal
-├── styles.css          # Estilos globais
-├── script.js           # Lógica principal (v6.0)
-├── public/
-│   └── screenshots/    # Imagens do README
-└── README.md           # Documentação
-```
-
