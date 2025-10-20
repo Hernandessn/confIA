@@ -219,4 +219,3 @@ No momento, não há API pública. Mas você pode embedar o site ou adaptar o c�
 
 ```
 
----
