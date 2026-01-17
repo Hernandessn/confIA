@@ -7,10 +7,10 @@
 // CONFIGURAÇÃO DE APIs
 // ==========================================
 const API_KEYS = {
-  gemini: 'AIzaSyBqBVTSzHb2SbnFgnDnVeo4hvyoRG39sro',
-  newsdata: 'pub_6dde2ebc4986466d82e1b5ac725fa99a',
-  currents: 'CFpXp_zt6b7-MrwMlDsR8z15MqxySjHLLNWaB3RwCVbAJeyt',
-  ocrspace: 'K88448454588957'
+  gemini: '',
+  newsdata: '',
+  currents: '',
+  ocrspace: ''
 };
 
 // ==========================================
