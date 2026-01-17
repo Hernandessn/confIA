@@ -70,9 +70,14 @@ Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explic
    - Filtragem de stopwords
    - Priorização por relevância
 
+<<<<<<< HEAD
 4. **Busca Paralela de Fontes**
    - NewsData.io (notícias brasileiras)
    - Currents API (notícias internacionais)
+=======
+4. **Busca de Fontes**
+   - NewsData.io (notícias brasileiras)
+>>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
    - Cache inteligente de 5 minutos
    - Timeout de 8 segundos com fallback
 
@@ -112,6 +117,7 @@ Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explic
    - Gráfico de confiabilidade (Chart.js)
    - Fontes verificadas com logos
    - Dicas educativas contextualizadas
+<<<<<<< HEAD
 
 ---
 
@@ -172,8 +178,11 @@ Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explic
 - "🚨 NÃO COMPARTILHE. Verifique em fact-checkers como Aos Fatos, Lupa ou Comprova."
 - "❌ Desconfie de linguagem emocional excessiva, urgência artificial e promessas irreais."
 - "📚 Evite cair em clickbait. Leia a notícia completa e verifique a fonte."
+=======
+>>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
 
 ---
+
 
 ## 🧩 Pilares do Pensamento Computacional Aplicados
 
@@ -190,6 +199,7 @@ Ele verifica se a notícia é verdadeira, duvidosa ou sensacionalista — explic
 
 O diagrama abaixo representa o fluxo lógico completo do **ConfIA v9.0**, incluindo as novas funcionalidades educativas:
 
+<<<<<<< HEAD
 <p align="center">
   <strong>Desconfie primeiro, depois ConfIA.</strong><br>
   Feito com 💙 e ☕ para combater a desinformação
@@ -334,6 +344,11 @@ else
 
 ---
 
+=======
+<img src="https://github.com/Hernandessn/confIA/blob/main/public/screenshots/Fluxograma-ConfIA.png?raw=true"/>
+
+
+>>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
 ## 🛡️ Segurança e Privacidade
 
 ### 🔒 Medidas de Segurança Implementadas
@@ -351,6 +366,7 @@ else
 ✅ **Dados locais** — histórico salvo apenas no seu navegador  
 ✅ **Sem cadastro** — uso 100% anônimo  
 ✅ **Open source** — código auditável publicamente  
+<<<<<<< HEAD
 
 ---
 
@@ -582,11 +598,14 @@ Se você usar o ConfIA em pesquisas acadêmicas, por favor cite:
 15. **Analytics →** Atualiza estatísticas persistentes.
 16. **Feedback Visual →** Exibe resultado + gráfico + fontes + dicas.
 17. **Fim.**
+=======
+>>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
 
 ---
 
-## 🧰 Tecnologias Utilizadas
+## 🌍 Impacto Social
 
+<<<<<<< HEAD
 | Categoria | Ferramenta | Versão/Detalhes |
 |------------|-------------|-----------------|
 | **Frontend** | HTML5, CSS3, JavaScript ES6+ | Vanilla JS (sem frameworks) |
@@ -821,6 +840,71 @@ confia/
 ├── README.md                  # Documentação completa (este arquivo)
 └── .gitignore                # Arquivos ignorados pelo Git
 ```
+=======
+### 📊 Objetivos do Projeto
+1. **Educação Digital** — Ensinar identificação de fake news
+2. **Combate à Desinformação** — Reduzir compartilhamento de notícias falsas
+3. **Pensamento Crítico** — Desenvolver habilidades analíticas
+4. **Democratização** — Acesso gratuito a verificação de fatos
+5. **Transparência** — Mostrar como a análise é feita
+
+### 🎯 Público-Alvo
+- 📱 **Usuários de redes sociais** — que compartilham notícias
+- 🎓 **Estudantes** — aprendendo sobre mídia e jornalismo
+- 👨‍🏫 **Educadores** — ensinando alfabetização digital
+- 📰 **Jornalistas** — verificando informações rapidamente
+- 👴 **Idosos** — grupo mais vulnerável a fake news
+
+### 💡 Casos de Uso Educativo
+1. **Em sala de aula** — Atividades de fact-checking
+2. **Em workshops** — Treinamento de alfabetização midiática
+3. **Em palestras** — Demonstrações práticas
+4. **Em projetos** — Integração com sistemas educacionais
+5. **Em pesquisas** — Estudos sobre desinformação
+
+## 💬 FAQ (Perguntas Frequentes)
+
+### ❓ O ConfIA é 100% preciso?
+**Não.** Nenhum sistema automatizado é 100% preciso. O ConfIA é uma **ferramenta educativa** que ajuda a identificar sinais de fake news, mas a verificação final deve ser feita por humanos em fact-checkers confiáveis.
+
+### ❓ Por que minha notícia apareceu como "Neutra"?
+Notícias **muito recentes**, **regionais** ou **locais** podem não ter cobertura ampla ainda. Isso não significa que sejam falsas, apenas que não foram divulgadas amplamente.
+
+### ❓ Posso confiar 100% nas classificações?
+O ConfIA deve ser usado como **primeira análise**. Para informações críticas, sempre verifique em múltiplas fontes confiáveis e fact-checkers profissionais.
+
+### ❓ Como o ConfIA protege minha privacidade?
+Todos os dados ficam **apenas no seu navegador**. Não coletamos, armazenamos ou compartilhamos nenhuma informação pessoal.
+
+### ❓ Posso usar o ConfIA comercialmente?
+Sim! O projeto é open source (licença MIT). Você pode usar, modificar e distribuir livremente, desde que mantenha os créditos.
+
+### ❓ Como posso contribuir?
+Veja a seção **[Contribuindo](#-contribuindo)** acima. Pull requests são bem-vindos!
+
+### ❓ O ConfIA funciona offline?
+Não completamente. As APIs de notícias e IA requerem conexão. No futuro, planejamos um modo offline com cache avançado.
+
+### ❓ Quais notícias o ConfIA consegue verificar?
+O ConfIA funciona melhor com notícias de **alcance nacional/internacional**. Notícias locais, regionais ou muito recentes podem não aparecer.
+
+### ❓ O ConfIA detecta deepfakes?
+Atualmente, não. O foco é em análise textual. Detecção de deepfakes está no roadmap futuro (v10.0).
+
+### ❓ Posso integrar o ConfIA no meu site?
+No momento, não há API pública. Mas você pode embedar o site ou adaptar o código (open source). API pública está planejada para v10.0.
+
+---
+
+## 📞 Contato e Suporte
+
+### 💬 Canais de Comunicação
+- 📧 **Email**: hernandesneves07@gmail.com
+- 💼 **LinkedIn**: www.linkedin.com/in/hernandes-sales
+
+
+```
+>>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
 
 ---
 
