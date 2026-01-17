@@ -175,39 +175,9 @@ O diagrama abaixo representa o fluxo lógico completo do **ConfIA v9.0**, inclui
 3. **Em palestras** — Demonstrações práticas
 4. **Em projetos** — Integração com sistemas educacionais
 5. **Em pesquisas** — Estudos sobre desinformação
+# 🔐 Segurança e Variáveis de Ambiente
 
-## 💬 FAQ (Perguntas Frequentes)
-
-### ❓ O ConfIA é 100% preciso?
-**Não.** Nenhum sistema automatizado é 100% preciso. O ConfIA é uma **ferramenta educativa** que ajuda a identificar sinais de fake news, mas a verificação final deve ser feita por humanos em fact-checkers confiáveis.
-
-### ❓ Por que minha notícia apareceu como "Neutra"?
-Notícias **muito recentes**, **regionais** ou **locais** podem não ter cobertura ampla ainda. Isso não significa que sejam falsas, apenas que não foram divulgadas amplamente.
-
-### ❓ Posso confiar 100% nas classificações?
-O ConfIA deve ser usado como **primeira análise**. Para informações críticas, sempre verifique em múltiplas fontes confiáveis e fact-checkers profissionais.
-
-### ❓ Como o ConfIA protege minha privacidade?
-Todos os dados ficam **apenas no seu navegador**. Não coletamos, armazenamos ou compartilhamos nenhuma informação pessoal.
-
-### ❓ Posso usar o ConfIA comercialmente?
-Sim! O projeto é open source (licença MIT). Você pode usar, modificar e distribuir livremente, desde que mantenha os créditos.
-
-### ❓ Como posso contribuir?
-Veja a seção **[Contribuindo](#-contribuindo)** acima. Pull requests são bem-vindos!
-
-### ❓ O ConfIA funciona offline?
-Não completamente. As APIs de notícias e IA requerem conexão. No futuro, planejamos um modo offline com cache avançado.
-
-### ❓ Quais notícias o ConfIA consegue verificar?
-O ConfIA funciona melhor com notícias de **alcance nacional/internacional**. Notícias locais, regionais ou muito recentes podem não aparecer.
-
-### ❓ O ConfIA detecta deepfakes?
-Atualmente, não. O foco é em análise textual. Detecção de deepfakes está no roadmap futuro (v10.0).
-
-### ❓ Posso integrar o ConfIA no meu site?
-No momento, não há API pública. Mas você pode embedar o site ou adaptar o código (open source). API pública está planejada para v10.0.
-
+Este projeto não armazena chaves de API, tokens ou credenciais sensíveis no código-fonte.
 ---
 
 ## 📞 Contato e Suporte
