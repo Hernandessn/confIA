@@ -175,9 +175,10 @@ O diagrama abaixo representa o fluxo lógico completo do **ConfIA v9.0**, inclui
 3. **Em palestras** — Demonstrações práticas
 4. **Em projetos** — Integração com sistemas educacionais
 5. **Em pesquisas** — Estudos sobre desinformação
-# 🔐 Segurança e Variáveis de Ambiente
+   
+### 🔐 Segurança e Variáveis de Ambiente
 
-Este projeto não armazena chaves de API, tokens ou credenciais sensíveis no código-fonte.
+   <p>Este projeto não armazena chaves de API, tokens ou credenciais sensíveis no código-fonte.</p>
 ---
 
 ## 📞 Contato e Suporte
@@ -186,6 +187,4 @@ Este projeto não armazena chaves de API, tokens ou credenciais sensíveis no c�
 - 📧 **Email**: hernandesneves07@gmail.com
 - 💼 **LinkedIn**: www.linkedin.com/in/hernandes-sales
 
-
-```
 
