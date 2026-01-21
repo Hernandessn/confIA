@@ -9,7 +9,7 @@
 const API_KEYS = {
   gemini: '',
   newsdata: '',
-  currents: '-',
+  currents: '',
   ocrspace: ''
 };
 

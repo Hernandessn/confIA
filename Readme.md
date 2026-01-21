@@ -392,7 +392,10 @@ else
 3. **Em palestras** — Demonstrações práticas
 4. **Em projetos** — Integração com sistemas educacionais
 5. **Em pesquisas** — Estudos sobre desinformação
+   
+### 🔐 Segurança e Variáveis de Ambiente
 
+<<<<<<< HEAD
 ---
 
 ## 🚀 Roadmap Futuro
@@ -894,6 +897,9 @@ Atualmente, não. O foco é em análise textual. Detecção de deepfakes está n
 ### ❓ Posso integrar o ConfIA no meu site?
 No momento, não há API pública. Mas você pode embedar o site ou adaptar o código (open source). API pública está planejada para v10.0.
 
+=======
+   <p>Este projeto não armazena chaves de API, tokens ou credenciais sensíveis no código-fonte.</p>
+>>>>>>> 34ed93eb6d8d4decb31670d072d601fb53a4c17b
 ---
 
 ## 📞 Contato e Suporte
@@ -903,6 +909,7 @@ No momento, não há API pública. Mas você pode embedar o site ou adaptar o c�
 - 💼 **LinkedIn**: www.linkedin.com/in/hernandes-sales
 
 
+<<<<<<< HEAD
 ```
 >>>>>>> 3feef4a623f4b7812b98308dec2bcc716da7e8b4
 
@@ -1059,3 +1066,5 @@ Desenvolvido com 💙 para a **Maratona Tech 2025**
 ---
 
 <p align="center">
+=======
+>>>>>>> 34ed93eb6d8d4decb31670d072d601fb53a4c17b
