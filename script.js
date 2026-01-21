@@ -4,12 +4,12 @@
 // ==========================================
 
 // ==========================================
-// CONFIGURAÇÃO DE APIs
+// CONFIGURAÇÃO DE APIs - COlOQUE SUAS CHAVES AQUI
 // ==========================================
 const API_KEYS = {
   gemini: '',
   newsdata: '',
-  currents: '',
+  currents: '-',
   ocrspace: ''
 };
 
