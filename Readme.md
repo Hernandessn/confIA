@@ -14,6 +14,7 @@ Desenvolvido para a **Maratona Tech 2025**, o ConfIA combina tecnologia, ética 
 ---
 ## 🏅 Reconhecimentos
 
+<<<<<<< HEAD
 Este projeto foi desenvolvido durante a **Maratona Tech 2025** e recebeu os seguintes reconhecimentos:
 
 - 🥈 **Medalha de Prata**:  [Certificado de Medalha de Prata](./public/screenshots/certificado%20de%20prata.png)
@@ -22,6 +23,8 @@ Este projeto foi desenvolvido durante a **Maratona Tech 2025** e recebeu os segu
 
 Os certificados estão disponíveis para consulta e comprovam a avaliação externa do projeto durante a competição.
 
+=======
+>>>>>>> 6541868 (Update Readme.md)
 ## ⚡ Funcionalidades
 
 ### 🔍 Verificação Inteligente
