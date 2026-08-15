@@ -1,0 +1,9 @@
+{
+  "name": "confia-backend",
+  "version": "10.0.0",
+  "private": true,
+  "description": "ConfIA - frontend estático + Netlify Functions como backend/proxy de APIs",
+  "engines": {
+    "node": ">=18"
+  }
+}
