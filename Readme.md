@@ -2,35 +2,34 @@
 
 <div align="center">
   <img src="./public/screenshots/logo-screenshots.png" width="300" />
-  
+
   [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://conf-ia.netlify.app/)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 </div>
 
-> Sistema inteligente de verificação de notícias que utiliza **IA Gemini 2.0 Flash**, **APIs de notícias confiáveis** e **técnicas avançadas de detecção de desinformação** para classificar manchetes em tempo real.
+> Sistema inteligente de verificação de notícias que utiliza **IA (Groq)**, **APIs de notícias confiáveis** e **técnicas avançadas de detecção de desinformação** para classificar manchetes em tempo real.
 
 Desenvolvido para a **Maratona Tech 2025**, o ConfIA combina tecnologia, ética digital e pensamento computacional para combater a desinformação.
 
 ---
+
 ## 🏅 Reconhecimentos
 
-<<<<<<< HEAD
 Este projeto foi desenvolvido durante a **Maratona Tech 2025** e recebeu os seguintes reconhecimentos:
 
-- 🥈 **Medalha de Prata**:  [Certificado de Medalha de Prata](./public/screenshots/certificado%20de%20prata.png)
-
+- 🥈 **Medalha de Prata**: [Certificado de Medalha de Prata](./public/screenshots/certificado%20de%20prata.png)
 - 📜 **Menção Honrosa**: [Certificado de Menção Honrosa](./public/screenshots/certificado%20de%20menção%20honrosa%20HERNANDES%20SALES%20NEVES.png)
 
 Os certificados estão disponíveis para consulta e comprovam a avaliação externa do projeto durante a competição.
 
-=======
->>>>>>> 6541868 (Update Readme.md)
+---
+
 ## ⚡ Funcionalidades
 
 ### 🔍 Verificação Inteligente
 - Análise de manchetes em **texto ou imagem (OCR)**
-- Verificação com **IA Gemini 2.0 Flash**
-- Consulta em **NewsData.io** e outras APIs
+- Verificação assistida por **IA (Groq)**
+- Consulta em **NewsData.io** e **Currents API**
 - Classificação em 4 níveis: Alta, Média, Neutra ou Baixa confiabilidade
 - Sistema de análise em **3 camadas** (Semântica, Comportamental, Lógica)
 
@@ -42,15 +41,40 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 
 ### 📊 Recursos Educativos
 - **Dicas educativas** contextualizadas por nível de confiabilidade
-- **Histórico** das últimas 10 verificações
+- **Histórico** das últimas 10 verificações (local, por navegador)
 - **Dashboard de estatísticas** com gráficos visuais
 - **Modais informativos** (Como funciona, Sobre, Histórico)
 
 ### 🎨 Interface Moderna
-- Design inspirado em **ChatGPT e Claude**
-- **Modo escuro** com gradientes modernos
-- **Responsivo** para desktop e mobile
+- Design inspirado em ChatGPT e Claude
+- Modo escuro com gradientes modernos
+- Responsivo para desktop e mobile
 - Animações suaves e feedback visual
+
+---
+
+## 🏗️ Arquitetura
+
+O ConfIA tem duas partes: um **frontend estático** (HTML/CSS/JS puro) e um **backend em Netlify Functions** que faz proxy de todas as chamadas de API externas.
+
+```
+Navegador → Netlify Functions → APIs externas (Groq, NewsData, Currents, OCR.space)
+```
+
+Isso existe por um motivo específico: **nenhuma chave de API fica exposta no código do cliente**. Nas versões anteriores desse projeto, as chaves ficavam direto no `script.js`, visíveis pra qualquer um que abrisse o DevTools. Agora elas vivem só como variável de ambiente no servidor.
+
+```
+netlify/functions/
+  search-news.js      → proxy NewsData.io + Currents API
+  ocr.js               → proxy OCR.space
+  analyze.js           → proxy Groq (classificação assistida por IA)
+  recent-news.js       → proxy do widget de notícias recentes
+  _utils/rateLimit.js  → rate limiting por IP via Upstash Redis
+```
+
+Rate limiting: 8 buscas/min e 3 uploads de imagem/min por IP, aplicado **no servidor** (não só no navegador, que qualquer um contorna via DevTools).
+
+Instruções completas de deploy (env vars, geração de chaves, etc.) em [`DEPLOY.md`](./DEPLOY.md).
 
 ---
 
@@ -65,7 +89,7 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 
 **2. Busca de Fontes**
 - Extração de keywords relevantes
-- Busca em NewsData.io e Currents API
+- Busca em NewsData.io e Currents API (via backend)
 - Cache inteligente de 5 minutos
 
 **3. Análise Multicamada**
@@ -84,7 +108,7 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 - Teorias conspiratórias conhecidas
 
 **4. Análise com IA e Classificação**
-- Interpretação contextual com Gemini
+- Interpretação contextual via Groq
 - Sistema de pontuação rigoroso
 - Feedback visual com explicação detalhada
 
@@ -113,9 +137,9 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 - Pode ser notícia local ou muito recente
 
 ### 🔴 BAIXA Confiabilidade
-- Score de absurdidade ≥ 50 pts OU
-- Absurdidade ≥ 30 pts + sensacionalismo ≥ 40 pts OU
-- Sensacionalismo ≥ 50 pts sem fontes tier-1 OU
+- Score de absurdidade ≥ 50 pts, OU
+- Absurdidade ≥ 30 pts + sensacionalismo ≥ 40 pts, OU
+- Sensacionalismo ≥ 50 pts sem fontes tier-1, OU
 - Múltiplos padrões de desinformação
 
 ---
@@ -124,7 +148,7 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 
 | Pilar | Aplicação |
 |-------|-----------|
-| **Decomposição** | Sistema modular: validação, OCR, keywords, busca, análise, classificação |
+| **Decomposição** | Sistema modular: validação, OCR, keywords, busca, análise, classificação — front e back separados |
 | **Reconhecimento de Padrões** | 30+ padrões de sensacionalismo, absurdos e teorias conspiratórias |
 | **Abstração** | Métricas essenciais: similaridade, scores, relevância de fontes |
 | **Algoritmo** | Sequência automatizada com cache, rate limiting e fallback |
@@ -136,8 +160,10 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 | Categoria | Tecnologia |
 |-----------|------------|
 | **Frontend** | HTML5, CSS3, JavaScript ES6+ |
-| **IA** | Google Gemini 2.0 Flash |
+| **Backend** | Netlify Functions (Node.js) |
+| **IA** | Groq |
 | **APIs** | NewsData.io, Currents API, OCR.space |
+| **Rate limiting** | Upstash Redis (REST API) |
 | **Gráficos** | Chart.js |
 | **Hospedagem** | Netlify |
 
@@ -149,28 +175,35 @@ Os certificados estão disponíveis para consulta e comprovam a avaliação exte
 Acesse: **[conf-ia.netlify.app](https://conf-ia.netlify.app/)**
 
 ### Localmente
+Requer as chaves de API próprias (não incluídas no repo) — veja [`DEPLOY.md`](./DEPLOY.md) pra saber onde gerar cada uma.
+
 ```bash
 # Clone o repositório
 git clone https://github.com/hernandessn/confia.git
-
-# Entre na pasta
 cd confia
 
-# Abra o index.html no navegador
-# Ou use um servidor local
-python -m http.server 8000
+# Copie o template de variáveis de ambiente e preencha com suas chaves
+cp .env.example .env
+
+# Rode com o Netlify CLI (necessário pras Functions funcionarem)
+npx netlify-cli dev
 ```
+
+Abre em `http://localhost:8888`.
+
+> ⚠️ Abrir o `index.html` direto no navegador (sem `netlify dev`) **não funciona** — as chamadas de API dependem das Netlify Functions rodando junto.
 
 ---
 
 ## 🔒 Segurança e Privacidade
 
-✅ Sanitização de entrada — remove scripts maliciosos  
-✅ Validação rigorosa — previne injeção de código  
-✅ Rate limiting — previne abuso  
-✅ Sem rastreamento — não coletamos dados pessoais  
-✅ Dados locais — histórico salvo apenas no navegador  
-✅ Open source — código auditável  
+✅ Chaves de API isoladas no backend — nunca expostas no código do cliente
+✅ Rate limiting real, aplicado no servidor (não contornável via DevTools)
+✅ Sanitização de entrada do usuário
+✅ Escape de HTML em todo conteúdo vindo de fontes externas (previne XSS)
+✅ Sem rastreamento — não coletamos dados pessoais
+✅ Histórico local — salvo apenas no navegador de cada pessoa, não centralizado
+✅ Open source — código auditável
 
 ---
 
@@ -179,43 +212,35 @@ python -m http.server 8000
 ### APIs (Planos Gratuitos)
 - **NewsData.io**: 200 req/dia
 - **Currents API**: 600 req/dia
-- **Gemini 2.0**: ~1500 req/dia
+- **Groq**: sujeito ao free tier da conta configurada
 - **OCR.space**: 25.000 req/mês
 
 ### Otimizações
-✅ Cache de 5 minutos  
-✅ Busca paralela  
-✅ Timeout de 8 segundos com fallback  
-✅ Rate limiting (8 buscas/min, 3 OCR/min)  
-✅ Compressão automática de imagens  
+✅ Cache de 5 minutos
+✅ Busca paralela
+✅ Timeout de 8 segundos com fallback
+✅ Rate limiting (8 buscas/min, 3 OCR/min por IP)
+✅ Compressão automática de imagens
+
+### Conhecidas
+- Histórico e estatísticas são por navegador (localStorage), não compartilhados entre dispositivos ou usuários.
+- Rate limiting é fail-open: se o Upstash estiver mal configurado ou fora do ar, as requisições passam sem limite em vez de travar a aplicação inteira.
 
 ---
 
 ## 💬 FAQ
 
-**O ConfIA é 100% preciso?**  
+**O ConfIA é 100% preciso?**
 Não. É uma ferramenta educativa. Para informações críticas, sempre verifique em fact-checkers profissionais.
 
-**Por que minha notícia apareceu como "Neutra"?**  
+**Por que minha notícia apareceu como "Neutra"?**
 Notícias muito recentes, locais ou regionais podem não ter cobertura ampla.
 
-**Como o ConfIA protege minha privacidade?**  
-Todos os dados ficam apenas no seu navegador. Não coletamos informações.
+**Como o ConfIA protege minha privacidade?**
+Histórico e estatísticas ficam apenas no seu navegador. As buscas passam pelo backend só pra consultar as APIs de notícia — não armazenamos nada do lado do servidor.
 
-**Posso usar comercialmente?**  
-Sim! Licença MIT. Use, modifique e distribua livremente.
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas!
-
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Add MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um Pull Request
+**Posso usar comercialmente?**
+Sim! Licença MIT. Use, modifique e distribua livremente — mas gere suas próprias chaves de API, não reutilize as de outro deploy.
 
 ---
 
@@ -224,4 +249,3 @@ Contribuições são bem-vindas!
 - 📧 **Email**: hernandesneves07@gmail.com
 - 💼 **LinkedIn**: [linkedin.com/in/hernandes-sales](https://linkedin.com/in/hernandes-sales)
 - 🐙 **GitHub**: [@hernandessn](https://github.com/hernandessn)
-
